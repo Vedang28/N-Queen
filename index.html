@@ -1,46 +1,743 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>N-Queen-Visualiser</title>
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Grammar Expedition</title>
+    
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load React -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Load Babel to compile JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-900">
+    <div id="root"></div>
 
-  <body>
-    <header class="header">
-      <h2>
-        N-Queens Visualiser <i class="fas fa-crown" style="color: #fdfffc"></i>
-      </h2>
-    </header>
-    <div class="n-queen">
-      <div class="inputbox">
-        <input type="number" class="numberbox" id="numberbox" required />
-        <label>Enter total Queens</label>
-      </div>
+    <script type="text/babel">
+        // Extract useState from the global React object instead of importing it
+        const { useState } = React;
 
-      <div class="slider-container">
-        <input
-          class="slider"
-          id="slider"
-          type="range"
-          min="0"
-          max="100"
-          value="60"
-        />
-        <div id="progress-bar"></div>
-      </div>
-      <button class="play-button" id="play-button">
-        <i class="fa fa-play" aria-hidden="true"></i> Play
-      </button>
-    </div>
+        // --- GAME DATA ---
+        const GAME_DATA = {
+          zones: [
+            {
+              id: 0,
+              title: "Detective Forest",
+              theme: "emerald",
+              icon: "🌲",
+              description: "Sentence Types, Word Classes, Noun Phrases, Apostrophes",
+              nodes: [
+                {
+                  id: "0-1",
+                  type: "sorter",
+                  title: "The Word Sorter",
+                  instruction: "Sort these words into Nouns, Verbs, or Adjectives.",
+                  categories: ["Noun", "Verb", "Adjective"],
+                  items: [
+                    { word: "Detective", correct: "Noun" },
+                    { word: "Search", correct: "Verb" },
+                    { word: "Mysterious", correct: "Adjective" },
+                    { word: "Footprint", correct: "Noun" },
+                    { word: "Investigate", correct: "Verb" },
+                    { word: "Gigantic", correct: "Adjective" }
+                  ]
+                },
+                {
+                  id: "0-2",
+                  type: "fixer",
+                  title: "The Broken Bridge",
+                  instruction: "Fix these broken sentences! Add capital letters, commas for lists, and apostrophes.",
+                  items: [
+                    {
+                      bad: "we need a map a compass and a torch",
+                      correct: ["We need a map, a compass and a torch.", "We need a map, a compass, and a torch."],
+                      hint: "Don't forget the capital letter and commas in your list!"
+                    },
+                    {
+                      bad: "i stepped on the dogs tail",
+                      correct: ["I stepped on the dog's tail."],
+                      hint: "Capital 'I' and an apostrophe for possession!"
+                    }
+                  ]
+                },
+                {
+                  id: "0-3",
+                  type: "reading",
+                  title: "Boss: The Lost Key",
+                  readingText: "The tall, thin detective walked slowly into the room. He sighed heavily. The golden key was gone from the desk. Suddenly, he noticed muddy footprints near the window.",
+                  questions: [
+                    {
+                      q: "Find and type the expanded noun phrase used to describe the detective.",
+                      answer: "The tall, thin detective"
+                    },
+                    {
+                      q: "INFERENCE: Why did the detective sigh heavily?",
+                      options: ["He was tired from walking.", "He was disappointed the key was stolen.", "He was angry at the window."],
+                      correctOption: 1
+                    },
+                    {
+                      q: "Which word in the text is an Adjective describing the key?",
+                      answer: "golden"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 1,
+              title: "Grammar Safari",
+              theme: "amber",
+              icon: "🦁",
+              description: "Adverbs, Prepositions, Plurals, Conjunctions",
+              nodes: [
+                {
+                  id: "1-1",
+                  type: "sorter",
+                  title: "Position or Action?",
+                  instruction: "Is the word telling us HOW (Adverb) or WHERE (Preposition)?",
+                  categories: ["Adverb (How)", "Preposition (Where)"],
+                  items: [
+                    { word: "Quickly", correct: "Adverb (How)" },
+                    { word: "Behind", correct: "Preposition (Where)" },
+                    { word: "Under", correct: "Preposition (Where)" },
+                    { word: "Loudly", correct: "Adverb (How)" },
+                    { word: "Silently", correct: "Adverb (How)" },
+                    { word: "Inside", correct: "Preposition (Where)" }
+                  ]
+                },
+                {
+                  id: "1-2",
+                  type: "fixer",
+                  title: "Tricky Plurals & Past Tense",
+                  instruction: "Rewrite the sentence changing the bolded words to their correct form.",
+                  items: [
+                    {
+                      bad: "Yesterday, three (mouse) (run) past my feet.",
+                      correct: ["Yesterday, three mice ran past my feet.", "yesterday, three mice ran past my feet."],
+                      hint: "Plural of mouse? Past tense of run?"
+                    },
+                    {
+                      bad: "The (child) (see) the elephant.",
+                      correct: ["The children saw the elephant.", "the children saw the elephant."],
+                      hint: "Plural of child? Past tense of see?"
+                    }
+                  ]
+                },
+                {
+                  id: "1-3",
+                  type: "reading",
+                  title: "Boss: Conjunction Junction",
+                  readingText: "The explorer hid behind the tree _______ the tiger was roaring. He held his breath _______ he didn't want to be found. He waited a long time _______ he finally sneaked away.",
+                  questions: [
+                    {
+                      q: "What is the best TIME glue word for the FIRST blank?",
+                      options: ["because", "while", "so"],
+                      correctOption: 1
+                    },
+                    {
+                      q: "What is the best CAUSE glue word for the SECOND blank?",
+                      options: ["because", "after", "before"],
+                      correctOption: 0
+                    },
+                    {
+                      q: "What is the best TIME glue word for the THIRD blank?",
+                      options: ["since", "as", "before"],
+                      correctOption: 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 2,
+              title: "Space Academy",
+              theme: "indigo",
+              icon: "🚀",
+              description: "Comparatives, Speech Marks, Prefixes, Present Perfect",
+              nodes: [
+                {
+                  id: "2-1",
+                  type: "sorter",
+                  title: "The Upgrade Station",
+                  instruction: "Sort the words into the correct Prefix meaning.",
+                  categories: ["Auto (Self)", "Super (Beyond)", "Anti (Against)"],
+                  items: [
+                    { word: "Pilot", correct: "Auto (Self)" },
+                    { word: "Human", correct: "Super (Beyond)" },
+                    { word: "Gravity", correct: "Anti (Against)" },
+                    { word: "Freeze", correct: "Anti (Against)" },
+                    { word: "Sonic", correct: "Super (Beyond)" },
+                    { word: "Graph", correct: "Auto (Self)" }
+                  ]
+                },
+                {
+                  id: "2-2",
+                  type: "fixer",
+                  title: "Alien Communication",
+                  instruction: "Add the missing speech marks and commas to these sentences!",
+                  items: [
+                    {
+                      bad: "I come in peace said the alien.",
+                      correct: ["\"I come in peace,\" said the alien."],
+                      hint: "Hug the spoken words. Don't forget the comma before the closing marks!"
+                    },
+                    {
+                      bad: "Look at that star shouted the pilot.",
+                      correct: ["\"Look at that star!\" shouted the pilot.", "\"Look at that star,\" shouted the pilot."],
+                      hint: "You can use a comma or an exclamation mark inside the speech sandwich."
+                    }
+                  ]
+                },
+                {
+                  id: "2-3",
+                  type: "reading",
+                  title: "Boss: The Captain's Log",
+                  readingText: "Captain's Log: I have fixed the rocket. Jupiter is the biggest planet in the solar system. It is much larger than Earth.",
+                  questions: [
+                    {
+                      q: "Which sentence is written in the Present Perfect Tense?",
+                      options: ["Captain's Log", "I have fixed the rocket.", "It is much larger than Earth."],
+                      correctOption: 1
+                    },
+                    {
+                      q: "Why does 'largest' use -est but 'larger' uses -er?",
+                      options: ["Because Jupiter is compared to EVERYTHING (-est) and then just ONE thing (-er).", "Because it sounds better.", "Because they are adverbs."],
+                      correctOption: 0
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 3,
+              title: "Ocean Deep Dive",
+              theme: "cyan",
+              icon: "🌊",
+              description: "Pronouns, Fronted Adverbials, Paragraphs",
+              nodes: [
+                {
+                  id: "3-1",
+                  type: "sorter",
+                  title: "Noun or Pronoun?",
+                  instruction: "Is the word a Noun, or a Pronoun (a noun-swapper)?",
+                  categories: ["Noun", "Pronoun"],
+                  items: [
+                    { word: "Shark", correct: "Noun" },
+                    { word: "He", correct: "Pronoun" },
+                    { word: "Submarine", correct: "Noun" },
+                    { word: "They", correct: "Pronoun" },
+                    { word: "Us", correct: "Pronoun" },
+                    { word: "Water", correct: "Noun" }
+                  ]
+                },
+                {
+                  id: "3-2",
+                  type: "fixer",
+                  title: "Fronted Adverbials",
+                  instruction: "Move the adverb to the FRONT of the sentence to make a Fronted Adverbial. (Don't forget the magic punctuation mark!)",
+                  items: [
+                    {
+                      bad: "The shark attacked suddenly.",
+                      correct: ["Suddenly, the shark attacked.", "Suddenly, the shark attacked"],
+                      hint: "Put 'Suddenly' at the start, and don't forget the COMMA."
+                    },
+                    {
+                      bad: "We found the treasure deep in the cave.",
+                      correct: ["Deep in the cave, we found the treasure.", "Deep in the cave, we found the treasure"],
+                      hint: "Move the WHERE phrase to the front!"
+                    }
+                  ]
+                },
+                {
+                  id: "3-3",
+                  type: "reading",
+                  title: "Final Boss: The Lost City",
+                  readingText: "The diver swam deeper until she saw the glowing city. \n\nThe next morning, she returned with her camera. She took photos of the ancient walls.",
+                  questions: [
+                    {
+                      q: "In the sentence '...until she saw the glowing city', the word UNTIL is a magic glue word. What kind of clause does it make?",
+                      options: ["A Main Clause", "A Subordinate Clause (Complex Sentence)", "A Bossy Clause"],
+                      correctOption: 1
+                    },
+                    {
+                      q: "Look at the TiP ToP rule! Why did the author start a new paragraph for 'The next morning'?",
+                      options: ["Change of Place", "Change of Person", "Change of Time"],
+                      correctOption: 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        };
 
-    <div class="queen-arrangement" id="queen-arrangement"></div>
-    <div id="n-queen-board"></div>
-    <script src="app.js"></script>
-  </body>
+        // --- STYLES MAP ---
+        const THEMES = {
+          emerald: { bg: "bg-emerald-600", text: "text-emerald-600", border: "border-emerald-600", light: "bg-emerald-50", hover: "hover:bg-emerald-600" },
+          amber: { bg: "bg-amber-500", text: "text-amber-500", border: "border-amber-500", light: "bg-amber-50", hover: "hover:bg-amber-500" },
+          indigo: { bg: "bg-indigo-600", text: "text-indigo-600", border: "border-indigo-600", light: "bg-indigo-50", hover: "hover:bg-indigo-600" },
+          cyan: { bg: "bg-cyan-600", text: "text-cyan-600", border: "border-cyan-600", light: "bg-cyan-50", hover: "hover:bg-cyan-600" }
+        };
+
+        function App() {
+          const [gameState, setGameState] = useState('menu'); // menu, map, node, victory
+          const [activeZone, setActiveZone] = useState(null);
+          const [activeNode, setActiveNode] = useState(null);
+          
+          // Progress Tracking
+          const [unlockedZones, setUnlockedZones] = useState([0]); // Array of zone IDs
+          const [completedNodes, setCompletedNodes] = useState([]); // Array of node IDs
+          const [xp, setXp] = useState(0);
+
+          const handleStartNode = (zone, node) => {
+            setActiveZone(zone);
+            setActiveNode(node);
+            setGameState('node');
+          };
+
+          const handleNodeComplete = (gainedXp) => {
+            if (!completedNodes.includes(activeNode.id)) {
+              const newCompleted = [...completedNodes, activeNode.id];
+              setCompletedNodes(newCompleted);
+              setXp(xp + gainedXp);
+
+              // Check if Zone is complete
+              const zoneNodes = activeZone.nodes.map(n => n.id);
+              const isZoneComplete = zoneNodes.every(id => newCompleted.includes(id));
+              
+              if (isZoneComplete && activeZone.id < GAME_DATA.zones.length - 1) {
+                if (!unlockedZones.includes(activeZone.id + 1)) {
+                  setUnlockedZones([...unlockedZones, activeZone.id + 1]);
+                }
+              } else if (isZoneComplete && activeZone.id === GAME_DATA.zones.length - 1) {
+                setGameState('victory');
+                return;
+              }
+            }
+            setGameState('map');
+          };
+
+          // --- RENDERERS ---
+
+          if (gameState === 'menu') {
+            return (
+              <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-center font-sans">
+                <div className="max-w-2xl bg-slate-800 p-10 rounded-3xl border-4 border-slate-600 shadow-2xl">
+                  <div className="text-8xl mb-6">🗺️</div>
+                  <h1 className="text-5xl font-extrabold text-white mb-4 tracking-tight">The Ultimate Grammar Expedition</h1>
+                  <p className="text-xl text-slate-300 mb-8">
+                    Team Viraj & Vedang: Travel through 4 zones, defeat the grammar bosses, and prove you are Master Linguists!
+                  </p>
+                  <button 
+                    onClick={() => setGameState('map')}
+                    className="bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-2xl py-4 px-10 rounded-full transition-transform transform hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                  >
+                    Start Expedition
+                  </button>
+                </div>
+              </div>
+            );
+          }
+
+          if (gameState === 'victory') {
+            return (
+              <div className="min-h-screen bg-yellow-500 flex flex-col items-center justify-center p-6 text-center font-sans">
+                <div className="text-9xl mb-6 animate-bounce">👑</div>
+                <h1 className="text-6xl font-extrabold text-slate-900 mb-4">EXPEDITION COMPLETE!</h1>
+                <p className="text-3xl text-slate-800 mb-8 font-bold">Commander Viraj, you have mastered Year 3 English.</p>
+                <div className="bg-white py-4 px-8 rounded-full text-3xl font-extrabold text-yellow-600 shadow-lg">
+                  Final Score: {xp} XP
+                </div>
+              </div>
+            );
+          }
+
+          if (gameState === 'map') {
+            return (
+              <div className="min-h-screen bg-slate-100 p-8 font-sans">
+                <div className="max-w-5xl mx-auto">
+                  <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-8 border-2 border-slate-200">
+                    <div>
+                      <h1 className="text-3xl font-extrabold text-slate-800">World Map</h1>
+                      <p className="text-slate-500 font-medium">Select your next encounter.</p>
+                    </div>
+                    <div className="bg-indigo-100 text-indigo-700 py-2 px-6 rounded-full font-bold text-xl border-2 border-indigo-200">
+                      Total XP: {xp}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-6">
+                    {GAME_DATA.zones.map((zone) => {
+                      const isUnlocked = unlockedZones.includes(zone.id);
+                      const t = THEMES[zone.theme];
+                      const zoneNodesCompleted = zone.nodes.filter(n => completedNodes.includes(n.id)).length;
+                      const isZoneDone = zoneNodesCompleted === zone.nodes.length;
+
+                      return (
+                        <div key={zone.id} className={`p-6 rounded-3xl border-4 transition-all ${isUnlocked ? `bg-white ${t.border} shadow-md` : 'bg-slate-200 border-slate-300 opacity-70'}`}>
+                          <div className="flex justify-between items-center mb-6">
+                            <div className="flex items-center gap-4">
+                              <div className={`text-5xl w-20 h-20 flex items-center justify-center rounded-2xl ${isUnlocked ? t.light : 'bg-slate-300'}`}>
+                                {zone.icon}
+                              </div>
+                              <div>
+                                <h2 className={`text-2xl font-extrabold ${isUnlocked ? 'text-slate-800' : 'text-slate-500'}`}>
+                                  {zone.title} {isZoneDone && '✅'}
+                                </h2>
+                                <p className="text-slate-500">{zone.description}</p>
+                              </div>
+                            </div>
+                            {isUnlocked && (
+                              <div className="font-bold text-slate-400">
+                                Progress: {zoneNodesCompleted} / {zone.nodes.length}
+                              </div>
+                            )}
+                          </div>
+
+                          {isUnlocked ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {zone.nodes.map((node, i) => {
+                                const isNodeDone = completedNodes.includes(node.id);
+                                // Node is playable if previous node is done, or it's the first node
+                                const isNodePlayable = i === 0 || completedNodes.includes(zone.nodes[i-1].id);
+
+                                return (
+                                  <button
+                                    key={node.id}
+                                    disabled={!isNodePlayable && !isNodeDone}
+                                    onClick={() => handleStartNode(zone, node)}
+                                    className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                                      isNodeDone ? `${t.bg} border-transparent text-white` :
+                                      isNodePlayable ? `bg-white ${t.border} ${t.text} hover:bg-slate-50 shadow-sm transform hover:-translate-y-1` :
+                                      'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+                                    }`}
+                                  >
+                                    <div className="font-bold mb-1">
+                                      {isNodeDone ? '★' : isNodePlayable ? '▶' : '🔒'} Encounter {i + 1}
+                                    </div>
+                                    <div className={`font-extrabold text-lg ${isNodeDone ? 'text-white' : 'text-slate-800'}`}>
+                                      {node.title}
+                                    </div>
+                                    <div className={`text-sm mt-1 ${isNodeDone ? 'text-white/80' : 'text-slate-500'}`}>
+                                      {node.type.toUpperCase()}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 text-slate-500 font-bold bg-slate-300/50 rounded-xl">
+                              Complete previous zone to unlock!
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // --- ENCOUNTER ROUTER ---
+          if (gameState === 'node') {
+            const theme = THEMES[activeZone.theme];
+            
+            return (
+              <div className={`min-h-screen ${theme.light} p-4 md:p-8 font-sans flex flex-col`}>
+                {/* Header */}
+                <div className="max-w-5xl w-full mx-auto mb-6 flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border-2 border-slate-200">
+                  <button 
+                    onClick={() => setGameState('map')}
+                    className="text-slate-500 hover:text-slate-800 font-bold px-4 py-2 bg-slate-100 rounded-lg"
+                  >
+                    ← Back to Map
+                  </button>
+                  <div className="text-xl font-extrabold flex items-center gap-2">
+                    <span>{activeZone.icon}</span> {activeZone.title} : {activeNode.title}
+                  </div>
+                  <div className="w-24"></div> {/* spacer */}
+                </div>
+
+                {/* Content */}
+                <div className="max-w-5xl w-full mx-auto flex-grow flex flex-col">
+                  {activeNode.type === 'sorter' && <SorterNode node={activeNode} theme={theme} onComplete={handleNodeComplete} />}
+                  {activeNode.type === 'fixer' && <FixerNode node={activeNode} theme={theme} onComplete={handleNodeComplete} />}
+                  {activeNode.type === 'reading' && <ReadingNode node={activeNode} theme={theme} onComplete={handleNodeComplete} />}
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        }
+
+        // --- NODE COMPONENTS ---
+
+        function SorterNode({ node, theme, onComplete }) {
+          const [currentIndex, setCurrentIndex] = useState(0);
+          const [localScore, setLocalScore] = useState(0);
+          const [feedback, setFeedback] = useState(null);
+
+          const currentItem = node.items[currentIndex];
+
+          const handleSort = (selectedCategory) => {
+            if (feedback) return;
+            
+            const isCorrect = selectedCategory === currentItem.correct;
+            if (isCorrect) setLocalScore(localScore + 1);
+            
+            setFeedback(isCorrect ? 'correct' : 'incorrect');
+
+            setTimeout(() => {
+              setFeedback(null);
+              if (currentIndex + 1 < node.items.length) {
+                setCurrentIndex(currentIndex + 1);
+              } else {
+                onComplete(localScore * 50 + 50); // Final score logic
+              }
+            }, 1000);
+          };
+
+          return (
+            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-lg border-4 border-white flex-grow flex flex-col items-center justify-center text-center">
+              <h2 className="text-2xl font-bold text-slate-500 mb-2">Sorting Challenge</h2>
+              <p className="text-xl text-slate-700 mb-10">{node.instruction}</p>
+
+              <div className="mb-12 relative w-full max-w-lg">
+                <div className={`text-6xl font-extrabold p-10 rounded-3xl border-4 shadow-inner transition-colors duration-300 ${
+                  feedback === 'correct' ? 'bg-green-100 border-green-400 text-green-700' :
+                  feedback === 'incorrect' ? 'bg-red-100 border-red-400 text-red-700' :
+                  'bg-slate-50 border-slate-200 text-slate-800'
+                }`}>
+                  {currentItem.word}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-4 justify-center w-full max-w-3xl">
+                {node.categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => handleSort(cat)}
+                    className={`flex-1 min-w-[200px] py-6 px-4 text-2xl font-extrabold text-white rounded-2xl shadow-md transition-transform transform hover:-translate-y-1 active:scale-95 ${theme.bg}`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="mt-12 text-slate-400 font-bold">
+                Word {currentIndex + 1} of {node.items.length}
+              </div>
+            </div>
+          );
+        }
+
+        function FixerNode({ node, theme, onComplete }) {
+          const [currentIndex, setCurrentIndex] = useState(0);
+          const [inputVal, setInputVal] = useState("");
+          const [status, setStatus] = useState("typing"); // typing, grading
+          const [showHint, setShowHint] = useState(false);
+          const [localScore, setLocalScore] = useState(0);
+
+          const currentItem = node.items[currentIndex];
+
+          const handleSubmit = () => {
+            setStatus("grading");
+          };
+
+          const handleTutorGrade = (isCorrect) => {
+            if (isCorrect) setLocalScore(localScore + 100);
+            
+            setInputVal("");
+            setStatus("typing");
+            setShowHint(false);
+
+            if (currentIndex + 1 < node.items.length) {
+              setCurrentIndex(currentIndex + 1);
+            } else {
+              onComplete(localScore + (isCorrect ? 100 : 0));
+            }
+          };
+
+          const isAutoMatch = currentItem.correct.some(c => c.trim().toLowerCase() === inputVal.trim().toLowerCase());
+
+          return (
+            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-lg border-4 border-white flex-grow flex flex-col">
+              <h2 className="text-2xl font-bold text-slate-500 mb-2">Sentence Surgery</h2>
+              <p className="text-xl text-slate-700 mb-8">{node.instruction}</p>
+
+              <div className="flex-grow flex flex-col justify-center">
+                {/* Broken Sentence */}
+                <div className="bg-red-50 border-l-8 border-red-400 p-6 rounded-xl mb-8">
+                  <p className="text-sm font-bold text-red-400 uppercase tracking-widest mb-2">Broken Sentence:</p>
+                  <p className="text-3xl font-mono text-slate-800">{currentItem.bad}</p>
+                </div>
+
+                {status === "typing" ? (
+                  <>
+                    <textarea
+                      value={inputVal}
+                      onChange={(e) => setInputVal(e.target.value)}
+                      placeholder="Type the fixed sentence here..."
+                      className="w-full h-32 p-6 text-2xl font-mono bg-slate-50 border-4 border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-none transition-colors mb-6 resize-none"
+                    />
+                    
+                    <div className="flex justify-between items-center">
+                      <button 
+                        onClick={() => setShowHint(!showHint)}
+                        className="text-amber-500 font-bold hover:bg-amber-50 px-4 py-2 rounded-lg transition-colors"
+                      >
+                        {showHint ? "Hide Hint" : "💡 Need a hint?"}
+                      </button>
+                      
+                      <button 
+                        onClick={handleSubmit}
+                        disabled={inputVal.trim().length === 0}
+                        className={`py-4 px-10 text-xl font-extrabold text-white rounded-full shadow-md transition-all ${theme.bg} hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        Check Answer
+                      </button>
+                    </div>
+                    
+                    {showHint && (
+                      <div className="mt-4 bg-amber-50 text-amber-700 p-4 rounded-lg font-medium border-2 border-amber-200">
+                        {currentItem.hint}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="bg-slate-50 border-4 border-slate-200 p-8 rounded-2xl text-center">
+                    <h3 className="text-xl font-bold text-slate-500 mb-4">Tutor Verification</h3>
+                    <p className="text-lg text-slate-600 mb-2">Viraj wrote:</p>
+                    <p className="text-2xl font-mono font-bold text-slate-800 mb-6 bg-white p-4 rounded-lg border">{inputVal}</p>
+                    
+                    <p className="text-lg text-slate-600 mb-2">Perfect Answers:</p>
+                    <div className="flex flex-col gap-2 mb-8">
+                      {currentItem.correct.map((c, i) => (
+                        <p key={i} className="text-xl font-mono text-green-600 font-bold">{c}</p>
+                      ))}
+                    </div>
+
+                    <p className="text-xl font-extrabold text-slate-800 mb-6">Vedang, did Viraj fix the sentence correctly?</p>
+                    <div className="flex justify-center gap-4">
+                      <button onClick={() => handleTutorGrade(false)} className="bg-red-100 hover:bg-red-200 text-red-700 font-bold py-3 px-8 rounded-xl text-lg border-2 border-red-300">
+                        No, try again
+                      </button>
+                      <button onClick={() => handleTutorGrade(true)} className="bg-green-500 hover:bg-green-400 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-md">
+                        Yes, perfect!
+                      </button>
+                    </div>
+                    {isAutoMatch && <p className="mt-4 text-green-500 font-bold">✨ Looks like a perfect match to me! ✨</p>}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 text-center text-slate-400 font-bold">
+                Sentence {currentIndex + 1} of {node.items.length}
+              </div>
+            </div>
+          );
+        }
+
+        function ReadingNode({ node, theme, onComplete }) {
+          const [currentIndex, setCurrentIndex] = useState(0);
+          const [showAnswer, setShowAnswer] = useState(false);
+          const [localScore, setLocalScore] = useState(0);
+
+          const currentQ = node.questions[currentIndex];
+          const isMultipleChoice = !!currentQ.options;
+
+          const handleNext = (isCorrect) => {
+            if (isCorrect) setLocalScore(localScore + 150);
+            setShowAnswer(false);
+            
+            if (currentIndex + 1 < node.questions.length) {
+              setCurrentIndex(currentIndex + 1);
+            } else {
+              onComplete(localScore + (isCorrect ? 150 : 0));
+            }
+          };
+
+          return (
+            <div className="bg-white rounded-3xl shadow-lg border-4 border-white flex-grow flex flex-col md:flex-row overflow-hidden">
+              
+              {/* Reading Passage Side */}
+              <div className={`w-full md:w-1/2 p-8 md:p-10 border-b-4 md:border-b-0 md:border-r-4 border-slate-100 bg-slate-50 flex flex-col`}>
+                <h2 className="text-xl font-bold text-slate-400 uppercase tracking-wider mb-6">Reading Passage</h2>
+                <div className="text-2xl leading-relaxed text-slate-700 font-medium whitespace-pre-wrap">
+                  {node.readingText}
+                </div>
+              </div>
+
+              {/* Question Side */}
+              <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center relative">
+                <div className="absolute top-6 right-6 text-slate-400 font-bold">
+                  Q {currentIndex + 1} / {node.questions.length}
+                </div>
+
+                <h3 className="text-2xl font-extrabold text-slate-800 mb-8 mt-4 leading-snug">
+                  {currentQ.q}
+                </h3>
+
+                {isMultipleChoice ? (
+                  <div className="flex flex-col gap-4 mb-8">
+                    {currentQ.options.map((opt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          if(!showAnswer) {
+                            handleNext(i === currentQ.correctOption);
+                          }
+                        }}
+                        className={`text-left p-5 rounded-xl border-2 text-xl font-bold transition-all ${
+                          showAnswer && i === currentQ.correctOption ? 'bg-green-100 border-green-500 text-green-800' :
+                          'bg-white border-slate-200 text-slate-600 hover:border-indigo-400 hover:bg-indigo-50'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    {!showAnswer ? (
+                      <div className="text-center bg-indigo-50 border-2 border-indigo-100 p-8 rounded-2xl">
+                        <p className="text-indigo-800 font-bold mb-4">Discuss the answer with Vedang.</p>
+                        <button 
+                          onClick={() => setShowAnswer(true)}
+                          className="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full"
+                        >
+                          Reveal Answer
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50 border-4 border-slate-200 p-6 rounded-2xl text-center animate-in fade-in">
+                        <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Answer:</p>
+                        <p className="text-2xl font-bold text-green-600 mb-6">{currentQ.answer}</p>
+                        <p className="text-lg font-bold text-slate-800 mb-4">Did Viraj get it right?</p>
+                        <div className="flex justify-center gap-4">
+                          <button onClick={() => handleNext(false)} className="bg-red-100 hover:bg-red-200 text-red-700 font-bold py-2 px-6 rounded-xl border border-red-300">No</button>
+                          <button onClick={() => handleNext(true)} className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-6 rounded-xl shadow-sm">Yes!</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          );
+        }
+
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
