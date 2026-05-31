@@ -51,10 +51,6 @@
             background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,255,170,0.1) 50%, rgba(0,0,0,0) 100%);
             animation: scan 4s linear infinite;
         }
-        @keyframes scan {
-            0% { top: -100px; }
-            100% { top: 100vh; }
-        }
         .crt-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -77,104 +73,248 @@
             { name: "Laser Pen", desc: "Can cut through solid steel doors.", icon: "🖊️" },
             { name: "X-Ray Specs", desc: "Allows the agent to see through walls.", icon: "🕶️" },
             { name: "EMP Watch", desc: "Disables all electronics in a 50ft radius.", icon: "⌚" },
-            { name: "Hover Boots", desc: "Silences footsteps and allows brief levitation.", icon: "👢" }
+            { name: "Hover Boots", desc: "Silences footsteps and allows brief levitation.", icon: "👢" },
+            { name: "Grappling Hook", desc: "Allows rapid scaling of high-security walls.", icon: "🪝" }
         ];
 
-        // --- THE MISSIONS: SECTION 3 GRAMMAR ---
+        // --- THE MISSIONS: SECTION 3 GRAMMAR & VOCABULARY ---
         const SERVERS = [
             {
                 id: "cause",
                 title: "Server 1: Cause & Effect",
                 icon: "🔗",
+                briefing: [
+                    "> Agents do not just say WHEN things happen, they explain WHY.",
+                    "> Use specific 'glue words' to link a Cause directly to an Effect.",
+                    "> WABUB words like 'because' and 'since' attach a reason to the action.",
+                    "> Words like 'therefore', 'consequently', and 'as a result' show the direct effect of what just happened."
+                ],
                 questions: [
-                    { q: "The guards were sleeping; ________, I sneaked past them.", options: ["because", "consequently", "but"], correct: 1 },
-                    { q: "Which word is a Subordinating Conjunction?", options: ["Because", "And", "Or"], correct: 0 },
-                    { q: "I dropped my radio ________ my hands were slippery.", options: ["therefore", "since", "so"], correct: 1 },
-                    { q: "The mission failed ________ of the bad weather.", options: ["as a result", "consequently", "although"], correct: 0 }
+                    { 
+                        q: "The guards were sleeping; ________, I sneaked past them.", 
+                        options: ["because", "consequently", "but"], 
+                        correct: 1,
+                        exp: "'Consequently' means 'as a result'. Because the guards slept (Cause), you sneaked past (Effect)."
+                    },
+                    { 
+                        q: "Which word is a Subordinating Conjunction (WABUB)?", 
+                        options: ["Because", "And", "Or"], 
+                        correct: 0,
+                        exp: "'Because' is the 'B' in the I SAW A WABUB rule! It glues a subordinate clause to a main sentence."
+                    },
+                    { 
+                        q: "I dropped my radio ________ my hands were slippery.", 
+                        options: ["therefore", "since", "so"], 
+                        correct: 1,
+                        exp: "'Since' acts just like 'because'. The slippery hands caused the radio to drop!"
+                    },
+                    { 
+                        q: "The mission failed ________ of the bad weather.", 
+                        options: ["because", "consequently", "although"], 
+                        correct: 0,
+                        exp: "'Because' is used to explain the direct reason why something happened."
+                    }
                 ]
             },
             {
                 id: "interrogation",
                 title: "Server 2: Interrogation",
                 icon: "🕵️",
+                briefing: [
+                    "> To trap suspects, you must master Negatives and Question Tags.",
+                    "> A NEGATIVE sentence uses words like 'not', 'never', 'nobody', or 'nothing'.",
+                    "> A QUESTION TAG is a sneaky mini-question at the end of a sentence.",
+                    "> THE GOLDEN RULE: A positive statement gets a negative tag (You did it, didn't you?). A negative statement gets a positive tag (You didn't do it, did you?)."
+                ],
                 questions: [
-                    { q: "Add a question tag: You hid the diamond, ________?", options: ["did you", "didn't you", "don't you"], correct: 1 },
-                    { q: "Turn this NEGATIVE: The vault is open.", options: ["The vault is closed.", "The vault is not open.", "Is the vault open?"], correct: 1 },
-                    { q: "Add a question tag: The laser is off, ________?", options: ["isn't it", "is it", "does it"], correct: 0 },
-                    { q: "Which sentence is a negative?", options: ["Nobody saw the spy.", "Everyone saw the spy.", "The spy ran away."], correct: 0 }
+                    { 
+                        q: "Add a question tag: You hid the diamond, ________?", 
+                        options: ["did you", "didn't you", "don't you"], 
+                        correct: 1,
+                        exp: "Rule: If the first part of the sentence is POSITIVE ('You hid'), the question tag must be NEGATIVE ('didn't you')."
+                    },
+                    { 
+                        q: "Turn this NEGATIVE: The vault is open.", 
+                        options: ["The vault is closed.", "The vault is not open.", "Is the vault open?"], 
+                        correct: 1,
+                        exp: "To make a sentence negative, we don't just change the adjective, we add negative words like 'not' or 'never'."
+                    },
+                    { 
+                        q: "Add a question tag: The laser is not on, ________?", 
+                        options: ["isn't it", "is it", "does it"], 
+                        correct: 1,
+                        exp: "Rule: Since the first part is NEGATIVE ('is not on'), the question tag must be POSITIVE ('is it?')."
+                    },
+                    { 
+                        q: "Which sentence is a negative?", 
+                        options: ["Nobody saw the spy.", "Everyone saw the spy.", "The spy ran away."], 
+                        correct: 0,
+                        exp: "Words like 'Nobody', 'Nothing', 'Never', and 'Not' immediately turn a sentence negative."
+                    }
                 ]
             },
             {
                 id: "paragraphs",
                 title: "Server 3: Mission Reports",
                 icon: "📄",
+                briefing: [
+                    "> Agents write two types of files: Fiction (stories) and Non-Fiction (reports).",
+                    "> In Fiction, use the TiP ToP rule. Start a new paragraph every time there is a change in Time, Place, Topic, or Person (when a new person speaks).",
+                    "> In Non-Fiction, group facts strictly by TOPIC.",
+                    "> Always use SUBHEADINGS in Non-Fiction to tell the reader what the next paragraph is about."
+                ],
                 questions: [
-                    { q: "In a NON-FICTION gadget report, paragraphs are sorted by:", options: ["Action", "Topic", "Dialogue"], correct: 1 },
-                    { q: "In a FICTION spy story, when do you start a new paragraph?", options: ["When someone new speaks", "Every 5 sentences", "At the end of the page"], correct: 0 },
-                    { q: "What should you use to organize paragraphs in a non-fiction report?", options: ["Speech marks", "Subheadings", "Question marks"], correct: 1 },
-                    { q: "TiP ToP Rule: What does the first 'P' stand for?", options: ["Person", "Place", "Paragraph"], correct: 1 }
+                    { 
+                        q: "In a NON-FICTION gadget report, paragraphs are sorted by:", 
+                        options: ["Action", "Topic", "Dialogue"], 
+                        correct: 1,
+                        exp: "Non-fiction reports (like information texts) group facts together based on their specific TOPIC."
+                    },
+                    { 
+                        q: "In a FICTION spy story, when do you start a new paragraph?", 
+                        options: ["When someone new speaks", "Every 5 sentences", "At the end of the page"], 
+                        correct: 0,
+                        exp: "The 'P' in the TiP ToP rule stands for Person! Every time a new person talks, you must start a new line."
+                    },
+                    { 
+                        q: "What should you use to organize paragraphs in a non-fiction report?", 
+                        options: ["Speech marks", "Subheadings", "Question marks"], 
+                        correct: 1,
+                        exp: "Subheadings act like mini-titles above a paragraph to tell the reader what topic is coming next."
+                    },
+                    { 
+                        q: "TiP ToP Rule: What does the first 'P' stand for?", 
+                        options: ["Person", "Place", "Paragraph"], 
+                        correct: 1,
+                        exp: "TiP ToP = Time, PLACE, Topic, Person. If the spy moves to a new room (a new Place), start a new paragraph!"
+                    }
                 ]
             },
             {
                 id: "morphology",
                 title: "Server 4: Gadget Upgrades",
                 icon: "🛠️",
+                briefing: [
+                    "> Words are like gadgets; they belong to families and can be upgraded!",
+                    "> A Word Family shares the same root base (e.g., SIGN, signal, signature).",
+                    "> Adding suffixes completely changes what a word does.",
+                    "> Adding '-ous' turns a noun into an adjective (Poison ➔ Poisonous).",
+                    "> Adding '-less' means 'without' (Care ➔ Careless)."
+                ],
                 questions: [
-                    { q: "Upgrade the noun 'poison' to an adjective:", options: ["Poisoned", "Poisonous", "Poisonly"], correct: 1 },
-                    { q: "Which word belongs to the same Word Family as 'sign'?", options: ["Sing", "Signature", "Sight"], correct: 1 },
-                    { q: "Upgrade the noun 'danger' to an adjective:", options: ["Dangerous", "Dangerly", "Endanger"], correct: 0 },
-                    { q: "What suffix turns 'care' into an adjective meaning 'without care'?", options: ["-ful", "-less", "-ness"], correct: 1 }
+                    { 
+                        q: "Upgrade the noun 'poison' to an adjective:", 
+                        options: ["Poisoned", "Poisonous", "Poisonly"], 
+                        correct: 1,
+                        exp: "Adding the suffix '-ous' turns a noun (the poison) into an adjective describing something (a poisonous snake)."
+                    },
+                    { 
+                        q: "Which word belongs to the same Word Family as 'sign'?", 
+                        options: ["Sing", "Signature", "Sight"], 
+                        correct: 1,
+                        exp: "Word families share the same root. 'Signature' has the root 'sign' hidden right at the start!"
+                    },
+                    { 
+                        q: "Upgrade the noun 'danger' to an adjective:", 
+                        options: ["Dangerous", "Dangerly", "Endanger"], 
+                        correct: 0,
+                        exp: "Just like poison, adding the suffix '-ous' turns the noun 'danger' into the adjective 'dangerous'."
+                    },
+                    { 
+                        q: "What suffix turns 'care' into an adjective meaning 'without care'?", 
+                        options: ["-ful", "-less", "-ness"], 
+                        correct: 1,
+                        exp: "The suffix '-less' means 'without'. So careless means without care, and fearless means without fear!"
+                    }
+                ]
+            },
+            {
+                id: "vocab",
+                title: "Server 5: Code Words",
+                icon: "🔐",
+                briefing: [
+                    "> Top-level agents must use exact, classified vocabulary to avoid mission failure.",
+                    "> Review your Code Words: Meticulous, Reluctant, Inevitable, Exaggerate, Contemplate, Abundance, Disgruntled, Compromise, Lethargic, Apprehensive.",
+                    "> Use the context clues in the field to select the correct code word to complete the data log."
+                ],
+                questions: [
+                    { 
+                        q: "The spy was extremely ________ about erasing his footprints, paying attention to every tiny detail.", 
+                        options: ["Meticulous", "Apprehensive", "Disgruntled"], 
+                        correct: 0,
+                        exp: "'Meticulous' means doing something with extreme care and attention to every small detail."
+                    },
+                    { 
+                        q: "After running from the guards all night, the agent felt very tired and ________.", 
+                        options: ["Inevitable", "Lethargic", "Reluctant"], 
+                        correct: 1,
+                        exp: "'Lethargic' means feeling extremely tired and having no energy or motivation."
+                    },
+                    { 
+                        q: "The villain didn't want to tell the truth; he was ________ to answer the questions.", 
+                        options: ["Abundance", "Meticulous", "Reluctant"], 
+                        correct: 2,
+                        exp: "'Reluctant' means not wanting to do something or being hesitant."
+                    },
+                    { 
+                        q: "The two rival spies agreed to a ________ so they could both escape safely.", 
+                        options: ["Compromise", "Exaggerate", "Contemplate"], 
+                        correct: 0,
+                        exp: "A 'Compromise' is an agreement where both sides give up something to settle a disagreement."
+                    },
+                    { 
+                        q: "Because of the heavy security, getting caught on camera was ________.", 
+                        options: ["Inevitable", "Disgruntled", "Apprehensive"], 
+                        correct: 0,
+                        exp: "'Inevitable' describes something that is certain to happen and cannot be avoided."
+                    }
                 ]
             }
         ];
 
         function App() {
-            const [gameState, setGameState] = useState('menu'); // menu, hacking, reward
+            const [gameState, setGameState] = useState('menu'); // menu, briefing, hacking, reward
             const [dataFragments, setDataFragments] = useState(0);
             const [unlockedGadgets, setUnlockedGadgets] = useState([]);
             const [activeServer, setActiveServer] = useState(null);
             const [qIndex, setQIndex] = useState(0);
-            const [feedback, setFeedback] = useState(null);
+            
+            // feedback states
+            const [feedbackStatus, setFeedbackStatus] = useState(null); // 'GRANTED' or 'DENIED'
 
-            const startHack = (serverIndex) => {
+            const selectServer = (serverIndex) => {
                 setActiveServer(SERVERS[serverIndex]);
                 setQIndex(0);
-                setFeedback(null);
+                setFeedbackStatus(null);
+                setGameState('briefing');
+            };
+
+            const beginHack = () => {
                 setGameState('hacking');
             };
 
             const handleAnswer = (optIndex) => {
-                if (feedback !== null) return;
-
+                if (feedbackStatus !== null) return;
+                
                 const isCorrect = optIndex === activeServer.questions[qIndex].correct;
-                setFeedback(isCorrect ? 'ACCESS GRANTED' : 'ACCESS DENIED');
+                setFeedbackStatus(isCorrect ? 'GRANTED' : 'DENIED');
 
                 if (isCorrect) {
-                    const newFrags = dataFragments + 1;
-                    setDataFragments(newFrags);
-                    
-                    setTimeout(() => {
-                        setFeedback(null);
-                        // Reward every 4 fragments
-                        if (newFrags % 4 === 0 && unlockedGadgets.length < GADGETS.length) {
-                            setGameState('reward');
-                        } else {
-                            nextQuestion();
-                        }
-                    }, 1200);
-                } else {
-                    setTimeout(() => {
-                        setFeedback(null);
-                        nextQuestion();
-                    }, 2000);
+                    setDataFragments(prev => prev + 1);
                 }
             };
 
-            const nextQuestion = () => {
-                if (qIndex + 1 < activeServer.questions.length) {
-                    setQIndex(qIndex + 1);
+            const handleNext = () => {
+                if (feedbackStatus === 'GRANTED' && dataFragments % 4 === 0 && unlockedGadgets.length < GADGETS.length) {
+                    setGameState('reward');
+                    setFeedbackStatus(null);
                 } else {
-                    setGameState('menu'); 
+                    if (qIndex + 1 < activeServer.questions.length) {
+                        setQIndex(qIndex + 1);
+                        setFeedbackStatus(null);
+                    } else {
+                        setGameState('menu'); 
+                    }
                 }
             };
 
@@ -182,7 +322,8 @@
                 const gadget = GADGETS[unlockedGadgets.length];
                 setUnlockedGadgets([...unlockedGadgets, gadget]);
                 if (qIndex + 1 < activeServer.questions.length) {
-                    nextQuestion();
+                    setQIndex(qIndex + 1);
+                    setFeedbackStatus(null);
                     setGameState('hacking');
                 } else {
                     setGameState('menu');
@@ -203,16 +344,16 @@
                                 </div>
                                 <div className="h-8 w-px bg-[#00ffaa]"></div>
                                 <div className="text-2xl text-[#ff3366]">
-                                    GADGETS SECURED: {unlockedGadgets.length}/4
+                                    GADGETS SECURED: {unlockedGadgets.length}/5
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
                             {SERVERS.map((server, idx) => (
                                 <button 
                                     key={idx}
-                                    onClick={() => startHack(idx)}
+                                    onClick={() => selectServer(idx)}
                                     className="bg-[#0a0a0a] p-6 border-2 border-[#33ccff] hover:bg-[#00ffaa] hover:text-black transition-all text-left flex items-center gap-6 group"
                                 >
                                     <div className="text-5xl">{server.icon}</div>
@@ -227,28 +368,55 @@
                 );
             }
 
+            // --- BRIEFING UI ---
+            if (gameState === 'briefing') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative">
+                        <div className="bg-[#0a0a0a] p-10 border-2 border-[#ff3366] w-full max-w-4xl shadow-[0_0_40px_rgba(255,51,102,0.15)] text-left">
+                            <div className="text-[#ff3366] mb-2 text-xl font-bold">> TOP SECRET PROTOCOL</div>
+                            <h2 className="text-4xl text-white mb-8 border-b border-[#ff3366] pb-4">{activeServer.title} - BRIEFING</h2>
+                            
+                            <div className="flex flex-col gap-4 mb-12">
+                                {activeServer.briefing.map((line, i) => (
+                                    <p key={i} className="text-[#00ffaa] text-2xl leading-relaxed">{line}</p>
+                                ))}
+                            </div>
+
+                            <div className="text-center">
+                                <button 
+                                    onClick={beginHack}
+                                    className="bg-[#ff3366] text-black font-black text-2xl py-4 px-12 hover:bg-white transition-all shadow-[0_0_20px_rgba(255,51,102,0.4)] hover:scale-105"
+                                >
+                                    > ACKNOWLEDGE & BEGIN HACK
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
             // --- HACKING UI ---
             if (gameState === 'hacking') {
                 const currentQ = activeServer.questions[qIndex];
                 
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative">
-                        <div className="w-full max-w-3xl flex justify-between items-center mb-8 border-b border-[#00ffaa] pb-4">
-                            <button onClick={() => setGameState('menu')} className="text-[#ff3366] hover:text-white">[ ABORT MISSION ]</button>
-                            <div className="text-xl">NODE {qIndex + 1} / {activeServer.questions.length}</div>
+                        <div className="w-full max-w-4xl flex justify-between items-center mb-8 border-b border-[#00ffaa] pb-4">
+                            <button onClick={() => setGameState('menu')} className="text-[#ff3366] hover:text-white border border-transparent hover:border-[#ff3366] px-3 py-1 transition-all">[ ABORT MISSION ]</button>
+                            <div className="text-xl bg-[#0a0a0a] px-4 py-2 border border-[#00ffaa]">NODE {qIndex + 1} / {activeServer.questions.length}</div>
                         </div>
 
-                        <div className="bg-[#0a0a0a] p-10 border border-[#00ffaa] w-full max-w-3xl text-center shadow-[0_0_30px_rgba(0,255,170,0.2)]">
-                            {!feedback ? (
+                        <div className="bg-[#0a0a0a] p-10 border-2 border-[#00ffaa] w-full max-w-4xl shadow-[0_0_40px_rgba(0,255,170,0.15)] text-center transition-all">
+                            {!feedbackStatus ? (
                                 <div>
-                                    <div className="text-[#33ccff] mb-4">> DECRYPTION REQUIRED_</div>
-                                    <h2 className="text-3xl text-white mb-10">{currentQ.q}</h2>
-                                    <div className="flex flex-col gap-4">
+                                    <div className="text-[#33ccff] mb-4 text-xl">> DECRYPTION REQUIRED_</div>
+                                    <h2 className="text-4xl text-white mb-10 leading-tight">{currentQ.q}</h2>
+                                    <div className="flex flex-col gap-4 max-w-2xl mx-auto">
                                         {currentQ.options.map((opt, i) => (
                                             <button 
                                                 key={i}
                                                 onClick={() => handleAnswer(i)}
-                                                className="bg-transparent hover:bg-[#00ffaa] hover:text-black border border-[#00ffaa] text-xl py-4 px-6 transition-colors uppercase"
+                                                className="bg-[#050505] hover:bg-[#00ffaa] hover:text-black border-2 border-[#00ffaa] text-2xl py-4 px-6 transition-all uppercase font-bold tracking-wider"
                                             >
                                                 > {opt}
                                             </button>
@@ -256,13 +424,28 @@
                                     </div>
                                 </div>
                             ) : (
-                                <div className="py-12">
-                                    <h2 className={`text-5xl font-bold mb-4 ${feedback === 'ACCESS GRANTED' ? 'text-[#00ffaa]' : 'text-[#ff3366] glitch-text'}`}>
-                                        [{feedback}]
+                                <div className="flex flex-col items-center animate-[fadeIn_0.5s_ease-out]">
+                                    <h2 className={`text-6xl font-black mb-6 ${feedbackStatus === 'GRANTED' ? 'text-[#00ffaa]' : 'text-[#ff3366] glitch-text'}`}>
+                                        [ ACCESS {feedbackStatus} ]
                                     </h2>
-                                    {feedback === 'ACCESS DENIED' && (
-                                        <p className="text-xl text-white mt-4">CORRECT OVERRIDE CODE: <br/> <span className="text-[#00ffaa]">> {currentQ.options[currentQ.correct]}</span></p>
+                                    
+                                    {feedbackStatus === 'DENIED' && (
+                                        <div className="text-2xl text-white mb-8 bg-[#ff3366]/20 p-4 border border-[#ff3366]">
+                                            CORRECT OVERRIDE: <span className="text-[#00ffaa] font-bold">{currentQ.options[currentQ.correct]}</span>
+                                        </div>
                                     )}
+
+                                    <div className="bg-[#111] border-l-4 border-[#33ccff] p-8 max-w-3xl text-left mb-10">
+                                        <p className="text-[#33ccff] text-xl mb-2">> TACTICAL ANALYSIS:</p>
+                                        <p className="text-white text-2xl leading-relaxed">{currentQ.exp}</p>
+                                    </div>
+
+                                    <button 
+                                        onClick={handleNext}
+                                        className="bg-[#00ffaa] text-black font-black text-2xl py-4 px-12 hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,170,0.4)] hover:scale-105"
+                                    >
+                                        {qIndex + 1 < activeServer.questions.length ? "> PROCEED TO NEXT NODE" : "> RETURN TO MAINFRAME"}
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -275,20 +458,20 @@
                 const gadget = GADGETS[unlockedGadgets.length];
                 
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative bg-black/80">
+                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative bg-black/90">
                         <div className="text-center">
                             <h1 className="text-5xl text-[#33ccff] mb-8">> NEW GADGET AUTHORIZED</h1>
                             
-                            <div className="bg-[#0a0a0a] p-10 border-2 border-[#33ccff] shadow-[0_0_50px_rgba(51,204,255,0.4)] max-w-xl mx-auto">
-                                <div className="text-8xl mb-6">{gadget.icon}</div>
-                                <h2 className="text-4xl text-white mb-4 uppercase">{gadget.name}</h2>
-                                <p className="text-xl text-[#00ffaa] mb-8">"{gadget.desc}"</p>
+                            <div className="bg-[#0a0a0a] p-12 border-4 border-[#33ccff] shadow-[0_0_60px_rgba(51,204,255,0.5)] max-w-2xl mx-auto">
+                                <div className="text-9xl mb-8 animate-bounce">{gadget.icon}</div>
+                                <h2 className="text-5xl text-white font-black mb-6 uppercase tracking-widest">{gadget.name}</h2>
+                                <p className="text-2xl text-[#00ffaa] mb-10 bg-[#00ffaa]/10 p-4 border border-[#00ffaa]">"{gadget.desc}"</p>
 
                                 <button 
                                     onClick={unlockGadget}
-                                    className="w-full bg-[#33ccff] text-black font-bold text-2xl py-4 hover:bg-white transition-colors"
+                                    className="w-full bg-[#33ccff] text-black font-black text-3xl py-6 hover:bg-white transition-all hover:scale-105"
                                 >
-                                    > EQUIP GADGET
+                                    > EQUIP GADGET & CONTINUE
                                 </button>
                             </div>
                         </div>
