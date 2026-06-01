@@ -1,489 +1,1460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spy Agency: Mainframe Hacker</title>
-    
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Load React -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Load Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCSE Computer Science - Python IDE</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface2: #0f3460;
+    --accent: #e94560;
+    --green: #00c853;
+    --green-bg: #0a3d1a;
+    --text: #e0e0e0;
+    --text-dim: #8892a4;
+    --border: #2a3a5c;
+    --editor-bg: #0d1117;
+    --yellow: #ffd600;
+    --orange: #ff9100;
+  }
 
-    <!-- Spy Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <style>
-        body {
-            background-color: #050505;
-            background-image: 
-                linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            color: #00ffaa;
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            min-height: 100vh;
-        }
-        .glitch-text {
-            text-shadow: 2px 0 #ff3366, -2px 0 #33ccff;
-            animation: glitch 2s infinite linear alternate-reverse;
-        }
-        @keyframes glitch {
-            0% { text-shadow: 2px 0 #ff3366, -2px 0 #33ccff; }
-            5% { text-shadow: -2px 0 #ff3366, 2px 0 #33ccff; }
-            10% { text-shadow: 2px 0 #ff3366, -2px 0 #33ccff; }
-            15% { text-shadow: -2px 0 #ff3366, 2px 0 #33ccff; }
-            20% { text-shadow: 2px 0 #ff3366, -2px 0 #33ccff; }
-            100% { text-shadow: 2px 0 #ff3366, -2px 0 #33ccff; }
-        }
-        .scanline {
-            width: 100%;
-            height: 100px;
-            z-index: 9999;
-            position: absolute;
-            pointer-events: none;
-            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,255,170,0.1) 50%, rgba(0,0,0,0) 100%);
-            animation: scan 4s linear infinite;
-        }
-        .crt-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.4) 100%);
-            pointer-events: none;
-            z-index: 9998;
-        }
-    </style>
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .progress-bar .bar {
+    width: 200px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar .bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .layout {
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 12px 0;
+  }
+
+  .sidebar h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    padding: 8px 16px;
+    margin-bottom: 4px;
+  }
+
+  .q-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+  }
+
+  .q-btn:hover { background: rgba(255,255,255,0.05); }
+  .q-btn.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+
+  .q-btn .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--text-dim);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .q-btn .dot.solved {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 6px rgba(0,200,83,0.4);
+  }
+
+  .q-btn .q-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .question-panel {
+    padding: 20px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    max-height: 40%;
+    overflow-y: auto;
+    transition: background 0.5s;
+  }
+
+  .question-panel.solved {
+    background: var(--green-bg);
+    border-bottom-color: var(--green);
+  }
+
+  .question-panel .q-number {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .question-panel.solved .q-number { color: var(--green); }
+
+  .question-panel .q-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .question-panel .q-body {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+  }
+
+  .question-panel .q-body code {
+    background: var(--editor-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85em;
+    color: var(--yellow);
+  }
+
+  .question-panel .q-body pre {
+    background: var(--editor-bg);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 10px 0;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: var(--yellow);
+  }
+
+  .question-panel .q-body table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.85rem;
+  }
+
+  .question-panel .q-body table th,
+  .question-panel .q-body table td {
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    text-align: left;
+  }
+
+  .question-panel .q-body table th {
+    background: var(--surface2);
+    font-weight: 600;
+  }
+
+  .question-panel .solved-badge {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .question-panel.solved .solved-badge { display: flex; }
+
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--editor-bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .editor-toolbar .file-tab {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .editor-toolbar .file-tab .py-icon {
+    color: var(--yellow);
+    font-weight: bold;
+  }
+
+  .btn {
+    padding: 7px 18px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-run {
+    background: var(--green);
+    color: #000;
+  }
+
+  .btn-run:hover { background: #00e676; }
+  .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-reset {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  .btn-reset:hover { border-color: var(--text); color: var(--text); }
+
+  .editor-wrapper {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+  }
+
+  .editor-wrapper textarea {
+    width: 100%;
+    height: 100%;
+    background: var(--editor-bg);
+    color: var(--text);
+    border: none;
+    padding: 16px;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    tab-size: 4;
+  }
+
+  .output-panel {
+    height: 140px;
+    min-height: 100px;
+    background: #000;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  .output-content {
+    flex: 1;
+    padding: 10px 16px;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  .output-content.error { color: var(--accent); }
+  .output-content.success { color: var(--green); }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    gap: 16px;
+  }
+
+  .loading-overlay.hidden { display: none; }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-overlay p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .hint-box {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(255, 214, 0, 0.08);
+    border-left: 3px solid var(--yellow);
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: var(--yellow);
+    display: none;
+  }
+
+  .input-prompt-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+
+  .input-prompt-overlay.hidden { display: none; }
+
+  .input-prompt-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    width: 380px;
+    max-width: 90%;
+  }
+
+  .input-prompt-box h3 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  .input-prompt-box p {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .input-prompt-box input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--editor-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    margin-bottom: 12px;
+  }
+
+  .input-prompt-box input:focus { border-color: var(--accent); }
+
+  .input-prompt-box .btn-submit-input {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+  }
+
+  .non-code-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .non-code-answer {
+    flex: 1;
+    padding: 20px 28px;
+    overflow-y: auto;
+  }
+
+  .non-code-answer label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .non-code-answer label:first-child { margin-top: 0; }
+
+  .non-code-answer input[type="text"],
+  .non-code-answer textarea {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--editor-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .non-code-answer input[type="text"]:focus,
+  .non-code-answer textarea:focus { border-color: var(--accent); }
+
+  .non-code-answer textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .non-code-answer .btn-check {
+    margin-top: 16px;
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .non-code-answer .btn-check:hover { background: #ff2d4f; }
+
+  .feedback-msg {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: none;
+  }
+
+  .feedback-msg.correct {
+    background: rgba(0,200,83,0.1);
+    color: var(--green);
+    border: 1px solid rgba(0,200,83,0.3);
+    display: block;
+  }
+
+  .feedback-msg.incorrect {
+    background: rgba(233,69,96,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(233,69,96,0.3);
+    display: block;
+  }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .layout { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
-    <div class="scanline"></div>
-    <div class="crt-overlay"></div>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState } = React;
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Loading Python environment (Pyodide)...</p>
+</div>
 
-        // --- THE REWARDS: SPY GADGETS ---
-        const GADGETS = [
-            { name: "Laser Pen", desc: "Can cut through solid steel doors.", icon: "🖊️" },
-            { name: "X-Ray Specs", desc: "Allows the agent to see through walls.", icon: "🕶️" },
-            { name: "EMP Watch", desc: "Disables all electronics in a 50ft radius.", icon: "⌚" },
-            { name: "Hover Boots", desc: "Silences footsteps and allows brief levitation.", icon: "👢" },
-            { name: "Grappling Hook", desc: "Allows rapid scaling of high-security walls.", icon: "🪝" }
-        ];
+<div class="input-prompt-overlay hidden" id="inputOverlay">
+  <div class="input-prompt-box">
+    <h3>Program needs input</h3>
+    <p id="inputLabel">Enter value:</p>
+    <input type="text" id="inputField" autocomplete="off">
+    <button class="btn btn-submit-input" id="inputSubmit">Submit</button>
+  </div>
+</div>
 
-        // --- THE MISSIONS: SECTION 3 GRAMMAR & VOCABULARY ---
-        const SERVERS = [
-            {
-                id: "cause",
-                title: "Server 1: Cause & Effect",
-                icon: "🔗",
-                briefing: [
-                    "> Agents do not just say WHEN things happen, they explain WHY.",
-                    "> Use specific 'glue words' to link a Cause directly to an Effect.",
-                    "> WABUB words like 'because' and 'since' attach a reason to the action.",
-                    "> Words like 'therefore', 'consequently', and 'as a result' show the direct effect of what just happened."
-                ],
-                questions: [
-                    { 
-                        q: "The guards were sleeping; ________, I sneaked past them.", 
-                        options: ["because", "consequently", "but"], 
-                        correct: 1,
-                        exp: "'Consequently' means 'as a result'. Because the guards slept (Cause), you sneaked past (Effect)."
-                    },
-                    { 
-                        q: "Which word is a Subordinating Conjunction (WABUB)?", 
-                        options: ["Because", "And", "Or"], 
-                        correct: 0,
-                        exp: "'Because' is the 'B' in the I SAW A WABUB rule! It glues a subordinate clause to a main sentence."
-                    },
-                    { 
-                        q: "I dropped my radio ________ my hands were slippery.", 
-                        options: ["therefore", "since", "so"], 
-                        correct: 1,
-                        exp: "'Since' acts just like 'because'. The slippery hands caused the radio to drop!"
-                    },
-                    { 
-                        q: "The mission failed ________ of the bad weather.", 
-                        options: ["because", "consequently", "although"], 
-                        correct: 0,
-                        exp: "'Because' is used to explain the direct reason why something happened."
-                    }
-                ]
-            },
-            {
-                id: "interrogation",
-                title: "Server 2: Interrogation",
-                icon: "🕵️",
-                briefing: [
-                    "> To trap suspects, you must master Negatives and Question Tags.",
-                    "> A NEGATIVE sentence uses words like 'not', 'never', 'nobody', or 'nothing'.",
-                    "> A QUESTION TAG is a sneaky mini-question at the end of a sentence.",
-                    "> THE GOLDEN RULE: A positive statement gets a negative tag (You did it, didn't you?). A negative statement gets a positive tag (You didn't do it, did you?)."
-                ],
-                questions: [
-                    { 
-                        q: "Add a question tag: You hid the diamond, ________?", 
-                        options: ["did you", "didn't you", "don't you"], 
-                        correct: 1,
-                        exp: "Rule: If the first part of the sentence is POSITIVE ('You hid'), the question tag must be NEGATIVE ('didn't you')."
-                    },
-                    { 
-                        q: "Turn this NEGATIVE: The vault is open.", 
-                        options: ["The vault is closed.", "The vault is not open.", "Is the vault open?"], 
-                        correct: 1,
-                        exp: "To make a sentence negative, we don't just change the adjective, we add negative words like 'not' or 'never'."
-                    },
-                    { 
-                        q: "Add a question tag: The laser is not on, ________?", 
-                        options: ["isn't it", "is it", "does it"], 
-                        correct: 1,
-                        exp: "Rule: Since the first part is NEGATIVE ('is not on'), the question tag must be POSITIVE ('is it?')."
-                    },
-                    { 
-                        q: "Which sentence is a negative?", 
-                        options: ["Nobody saw the spy.", "Everyone saw the spy.", "The spy ran away."], 
-                        correct: 0,
-                        exp: "Words like 'Nobody', 'Nothing', 'Never', and 'Not' immediately turn a sentence negative."
-                    }
-                ]
-            },
-            {
-                id: "paragraphs",
-                title: "Server 3: Mission Reports",
-                icon: "📄",
-                briefing: [
-                    "> Agents write two types of files: Fiction (stories) and Non-Fiction (reports).",
-                    "> In Fiction, use the TiP ToP rule. Start a new paragraph every time there is a change in Time, Place, Topic, or Person (when a new person speaks).",
-                    "> In Non-Fiction, group facts strictly by TOPIC.",
-                    "> Always use SUBHEADINGS in Non-Fiction to tell the reader what the next paragraph is about."
-                ],
-                questions: [
-                    { 
-                        q: "In a NON-FICTION gadget report, paragraphs are sorted by:", 
-                        options: ["Action", "Topic", "Dialogue"], 
-                        correct: 1,
-                        exp: "Non-fiction reports (like information texts) group facts together based on their specific TOPIC."
-                    },
-                    { 
-                        q: "In a FICTION spy story, when do you start a new paragraph?", 
-                        options: ["When someone new speaks", "Every 5 sentences", "At the end of the page"], 
-                        correct: 0,
-                        exp: "The 'P' in the TiP ToP rule stands for Person! Every time a new person talks, you must start a new line."
-                    },
-                    { 
-                        q: "What should you use to organize paragraphs in a non-fiction report?", 
-                        options: ["Speech marks", "Subheadings", "Question marks"], 
-                        correct: 1,
-                        exp: "Subheadings act like mini-titles above a paragraph to tell the reader what topic is coming next."
-                    },
-                    { 
-                        q: "TiP ToP Rule: What does the first 'P' stand for?", 
-                        options: ["Person", "Place", "Paragraph"], 
-                        correct: 1,
-                        exp: "TiP ToP = Time, PLACE, Topic, Person. If the spy moves to a new room (a new Place), start a new paragraph!"
-                    }
-                ]
-            },
-            {
-                id: "morphology",
-                title: "Server 4: Gadget Upgrades",
-                icon: "🛠️",
-                briefing: [
-                    "> Words are like gadgets; they belong to families and can be upgraded!",
-                    "> A Word Family shares the same root base (e.g., SIGN, signal, signature).",
-                    "> Adding suffixes completely changes what a word does.",
-                    "> Adding '-ous' turns a noun into an adjective (Poison ➔ Poisonous).",
-                    "> Adding '-less' means 'without' (Care ➔ Careless)."
-                ],
-                questions: [
-                    { 
-                        q: "Upgrade the noun 'poison' to an adjective:", 
-                        options: ["Poisoned", "Poisonous", "Poisonly"], 
-                        correct: 1,
-                        exp: "Adding the suffix '-ous' turns a noun (the poison) into an adjective describing something (a poisonous snake)."
-                    },
-                    { 
-                        q: "Which word belongs to the same Word Family as 'sign'?", 
-                        options: ["Sing", "Signature", "Sight"], 
-                        correct: 1,
-                        exp: "Word families share the same root. 'Signature' has the root 'sign' hidden right at the start!"
-                    },
-                    { 
-                        q: "Upgrade the noun 'danger' to an adjective:", 
-                        options: ["Dangerous", "Dangerly", "Endanger"], 
-                        correct: 0,
-                        exp: "Just like poison, adding the suffix '-ous' turns the noun 'danger' into the adjective 'dangerous'."
-                    },
-                    { 
-                        q: "What suffix turns 'care' into an adjective meaning 'without care'?", 
-                        options: ["-ful", "-less", "-ness"], 
-                        correct: 1,
-                        exp: "The suffix '-less' means 'without'. So careless means without care, and fearless means without fear!"
-                    }
-                ]
-            },
-            {
-                id: "vocab",
-                title: "Server 5: Code Words",
-                icon: "🔐",
-                briefing: [
-                    "> Top-level agents must use exact, classified vocabulary to avoid mission failure.",
-                    "> Review your Code Words: Meticulous, Reluctant, Inevitable, Exaggerate, Contemplate, Abundance, Disgruntled, Compromise, Lethargic, Apprehensive.",
-                    "> Use the context clues in the field to select the correct code word to complete the data log."
-                ],
-                questions: [
-                    { 
-                        q: "The spy was extremely ________ about erasing his footprints, paying attention to every tiny detail.", 
-                        options: ["Meticulous", "Apprehensive", "Disgruntled"], 
-                        correct: 0,
-                        exp: "'Meticulous' means doing something with extreme care and attention to every small detail."
-                    },
-                    { 
-                        q: "After running from the guards all night, the agent felt very tired and ________.", 
-                        options: ["Inevitable", "Lethargic", "Reluctant"], 
-                        correct: 1,
-                        exp: "'Lethargic' means feeling extremely tired and having no energy or motivation."
-                    },
-                    { 
-                        q: "The villain didn't want to tell the truth; he was ________ to answer the questions.", 
-                        options: ["Abundance", "Meticulous", "Reluctant"], 
-                        correct: 2,
-                        exp: "'Reluctant' means not wanting to do something or being hesitant."
-                    },
-                    { 
-                        q: "The two rival spies agreed to a ________ so they could both escape safely.", 
-                        options: ["Compromise", "Exaggerate", "Contemplate"], 
-                        correct: 0,
-                        exp: "A 'Compromise' is an agreement where both sides give up something to settle a disagreement."
-                    },
-                    { 
-                        q: "Because of the heavy security, getting caught on camera was ________.", 
-                        options: ["Inevitable", "Disgruntled", "Apprehensive"], 
-                        correct: 0,
-                        exp: "'Inevitable' describes something that is certain to happen and cannot be avoided."
-                    }
-                ]
-            }
-        ];
+<div class="header">
+  <h1><span>GCSE</span> Computer Science &mdash; Python IDE</h1>
+  <div class="progress-bar">
+    <span id="progressText">0 / 20 solved</span>
+    <div class="bar"><div class="bar-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</div>
 
-        function App() {
-            const [gameState, setGameState] = useState('menu'); // menu, briefing, hacking, reward
-            const [dataFragments, setDataFragments] = useState(0);
-            const [unlockedGadgets, setUnlockedGadgets] = useState([]);
-            const [activeServer, setActiveServer] = useState(null);
-            const [qIndex, setQIndex] = useState(0);
-            
-            // feedback states
-            const [feedbackStatus, setFeedbackStatus] = useState(null); // 'GRANTED' or 'DENIED'
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <h2>Questions</h2>
+  </div>
 
-            const selectServer = (serverIndex) => {
-                setActiveServer(SERVERS[serverIndex]);
-                setQIndex(0);
-                setFeedbackStatus(null);
-                setGameState('briefing');
-            };
+  <div class="main" id="mainArea">
+    <div class="question-panel" id="questionPanel">
+      <div class="q-number" id="qNumber"></div>
+      <div class="q-title" id="qTitle"></div>
+      <div class="q-body" id="qBody"></div>
+      <div class="hint-box" id="hintBox"></div>
+      <div class="solved-badge">&#10003; Correct - Question Solved!</div>
+    </div>
 
-            const beginHack = () => {
-                setGameState('hacking');
-            };
+    <div class="editor-area" id="editorArea">
+      <div class="editor-toolbar">
+        <div class="file-tab"><span class="py-icon">PY</span> solution.py</div>
+        <div>
+          <button class="btn btn-reset" onclick="resetCode()">Reset</button>
+          <button class="btn btn-run" id="runBtn" onclick="runCode()">&#9654; Run</button>
+        </div>
+      </div>
+      <div class="editor-wrapper">
+        <textarea id="codeEditor" spellcheck="false" placeholder="# Write your Python code here..."></textarea>
+      </div>
+      <div class="output-panel">
+        <div class="output-header">
+          <span>Output</span>
+          <span id="outputStatus"></span>
+        </div>
+        <div class="output-content" id="outputContent">Click "Run" to execute your code.</div>
+      </div>
+    </div>
 
-            const handleAnswer = (optIndex) => {
-                if (feedbackStatus !== null) return;
-                
-                const isCorrect = optIndex === activeServer.questions[qIndex].correct;
-                setFeedbackStatus(isCorrect ? 'GRANTED' : 'DENIED');
+    <div class="non-code-panel" id="nonCodePanel" style="display:none">
+    </div>
+  </div>
+</div>
 
-                if (isCorrect) {
-                    setDataFragments(prev => prev + 1);
-                }
-            };
+<script>
+const QUESTIONS = [
+  {
+    id: 1,
+    title: "Username Generator",
+    type: "code",
+    body: `A school wants to create usernames using this rule: <strong>Initial + First 3 letters of last name + year</strong>.<br><br>
+Example: David Hamilton, 2024 &rarr; <code>DHam2024</code><br><br>
+The algorithm has been started:<pre>FName = input("Enter first name")
+LName = input("Enter last name")
+year = input("Enter year")
+username = ???
+print(username)</pre>
+Complete the program so it correctly creates and prints the username using string manipulation.`,
+    starter: `FName = input("Enter first name: ")\nLName = input("Enter last name: ")\nyear = input("Enter year: ")\nusername = \nprint(username)`,
+    tests: [
+      { inputs: ["David", "Hamilton", "2024"], expected: "DHam2024" },
+      { inputs: ["Sarah", "Jones", "2023"], expected: "SJon2023" },
+      { inputs: ["Alice", "Brown", "2025"], expected: "ABro2025" }
+    ],
+    hint: "Use indexing like FName[0] for the initial, LName[0:3] for first 3 letters, and concatenate with +"
+  },
+  {
+    id: 2,
+    title: "Library Book Logger",
+    type: "code",
+    body: `Write an algorithm that:<br>
+<ul>
+<li>Inputs the title and year of a book from the user</li>
+<li>Permanently stores the book title and year to a text file named <code>books.txt</code></li>
+<li>Closes the file</li>
+</ul>
+<em>Note: In this environment, file operations are simulated. Your code should use <code>open()</code>, <code>.write()</code>, and <code>.close()</code> with append mode <code>"a"</code>.</em>`,
+    starter: `title = input("Enter book title: ")\nyear = input("Enter year: ")\n`,
+    tests: [
+      {
+        inputs: ["Harry Potter", "1997"],
+        validator: "file_write",
+        checkFile: "books.txt",
+        checkContains: ["Harry Potter", "1997"]
+      }
+    ],
+    hint: 'Use open("books.txt", "a") to open in append mode, then .write() and .close()'
+  },
+  {
+    id: 3,
+    title: "SQL Query - Stock Table",
+    type: "noncode",
+    body: `The database table <strong>Stock</strong> stores product information:<br>
+<table>
+<tr><th>ProdName</th><th>Quantity</th><th>Price</th></tr>
+<tr><td>Biscuits</td><td>143</td><td>0.99</td></tr>
+<tr><td>Bread</td><td>87</td><td>1.49</td></tr>
+<tr><td>Milk</td><td>34</td><td>1.10</td></tr>
+<tr><td>Pasta</td><td>421</td><td>0.89</td></tr>
+</table><br>
+Complete the SQL query to return the product name and quantity of all products where the price is less than &pound;1.`,
+    fields: [
+      { label: "SELECT", key: "select", placeholder: "e.g. ProdName, Quantity" },
+      { label: "FROM", key: "from", placeholder: "e.g. Stock" },
+      { label: "WHERE", key: "where", placeholder: "e.g. Price < 1" }
+    ],
+    validator: function(answers) {
+      const s = answers.select.replace(/\s+/g,'').toLowerCase();
+      const f = answers.from.replace(/\s+/g,'').toLowerCase();
+      const w = answers.where.replace(/\s+/g,'').toLowerCase();
+      const selectOk = (s.includes('prodname') && s.includes('quantity'));
+      const fromOk = (f === 'stock');
+      const whereOk = (w.includes('price') && (w.includes('<1') || w.includes('< 1') || w.includes('<1.00') || w.includes('< 1.00')));
+      return selectOk && fromOk && whereOk;
+    },
+    hint: "SELECT needs two columns separated by comma. WHERE uses < operator."
+  },
+  {
+    id: 4,
+    title: "Flight Cost Function",
+    type: "code",
+    body: `Economy ticket = &pound;199. First-class = &pound;595.<br><br>
+Create a function <code>flightCost()</code> that takes the <strong>number of passengers</strong> and the <strong>type of ticket</strong> ("economy" or "first") as parameters, calculates and <strong>returns</strong> the total price.`,
+    starter: `def flightCost(passengers, ticketType):\n    \n`,
+    tests: [
+      { call: "print(flightCost(3, 'economy'))", expected: "597" },
+      { call: "print(flightCost(2, 'first'))", expected: "1190" },
+      { call: "print(flightCost(1, 'economy'))", expected: "199" },
+      { call: "print(flightCost(1, 'first'))", expected: "595" }
+    ],
+    hint: 'Use if/elif to check ticketType and multiply by the correct price'
+  },
+  {
+    id: 5,
+    title: "Car Dealership Validator",
+    type: "code",
+    body: `A car dealership only sells cars with <strong>fewer than 15,000 miles</strong> and <strong>10 years old or less</strong>.<br><br>
+Write an algorithm that:
+<ul>
+<li>Asks the user to enter the number of miles and the age of a car</li>
+<li>Validates both values are &ge; 0 and within the upper limits</li>
+<li>Outputs <code>True</code> if valid or <code>False</code> if invalid</li>
+</ul>`,
+    starter: `miles = int(input("Enter miles: "))\nage = int(input("Enter age: "))\n`,
+    tests: [
+      { inputs: ["10000", "5"], expected: "True" },
+      { inputs: ["15000", "5"], expected: "False" },
+      { inputs: ["14999", "10"], expected: "True" },
+      { inputs: ["10000", "11"], expected: "False" },
+      { inputs: ["-1", "5"], expected: "False" },
+      { inputs: ["5000", "-1"], expected: "False" },
+      { inputs: ["0", "0"], expected: "True" }
+    ],
+    hint: "Check: miles >= 0 AND miles < 15000 AND age >= 0 AND age <= 10"
+  },
+  {
+    id: 6,
+    title: "2D Array - TV Minutes",
+    type: "code",
+    body: `TV watching minutes are stored in a 2D array <code>minsWatched</code>.<br>
+Columns: 0=Quinn, 1=Lyla, 2=Harry, 3=Elias<br>
+Rows: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday<br><br>
+Write a line of code to output the minutes Harry watched TV on Friday.<br><br>
+<em>The array is pre-loaded for you. Just write the print statement.</em>`,
+    starter: `minsWatched = [\n    [30, 45, 60, 20],\n    [25, 50, 40, 35],\n    [15, 30, 55, 45],\n    [40, 20, 35, 50],\n    [60, 45, 70, 30]\n]\n`,
+    tests: [
+      { inputs: [], expected: "70" }
+    ],
+    hint: "Harry is column index 2, Friday is row index 4: minsWatched[4][2]"
+  },
+  {
+    id: 7,
+    title: "Trace Table",
+    type: "noncode",
+    body: `Trace the following program:<pre>01 x = 15
+02 y = 0
+03 while x > 0
+04   y = y + 1
+05   x = x - y
+06 endwhile
+07 print(y)</pre>
+Complete the trace table showing the values of x and y after each iteration, and the final output.`,
+    fields: [
+      { label: "After iteration 1: x =", key: "x1", placeholder: "value of x" },
+      { label: "After iteration 1: y =", key: "y1", placeholder: "value of y" },
+      { label: "After iteration 2: x =", key: "x2", placeholder: "value of x" },
+      { label: "After iteration 2: y =", key: "y2", placeholder: "value of y" },
+      { label: "After iteration 3: x =", key: "x3", placeholder: "value of x" },
+      { label: "After iteration 3: y =", key: "y3", placeholder: "value of y" },
+      { label: "After iteration 4: x =", key: "x4", placeholder: "value of x" },
+      { label: "After iteration 4: y =", key: "y4", placeholder: "value of y" },
+      { label: "After iteration 5: x =", key: "x5", placeholder: "value of x" },
+      { label: "After iteration 5: y =", key: "y5", placeholder: "value of y" },
+      { label: "Final output (print y):", key: "output", placeholder: "output" }
+    ],
+    validator: function(a) {
+      return a.x1==="14" && a.y1==="1" &&
+             a.x2==="12" && a.y2==="2" &&
+             a.x3==="9" && a.y3==="3" &&
+             a.x4==="5" && a.y4==="4" &&
+             a.x5==="0" && a.y5==="5" &&
+             a.output==="5";
+    },
+    hint: "Each loop: y goes up by 1, then x = x - y. Loop stops when x <= 0."
+  },
+  {
+    id: 8,
+    title: "Flowchart to Code",
+    type: "code",
+    body: `Convert this flowchart logic to Python code:<br><br>
+<strong>Input:</strong> Enter price of item<br>
+<strong>Decision:</strong> Is Price &lt; 50?<br>
+&nbsp;&nbsp;If Yes: Output "Great choice!"<br>
+&nbsp;&nbsp;If No: Output "Way too expensive"`,
+    starter: ``,
+    tests: [
+      { inputs: ["30"], expected: "Great choice!" },
+      { inputs: ["49"], expected: "Great choice!" },
+      { inputs: ["50"], expected: "Way too expensive" },
+      { inputs: ["100"], expected: "Way too expensive" }
+    ],
+    hint: 'Use input() to get the price, int() or float() to cast it, then if/else'
+  },
+  {
+    id: 9,
+    title: "Short ID Generator",
+    type: "code",
+    body: `Write an algorithm using string manipulation that:
+<ul>
+<li>Asks the user to input a word</li>
+<li>Extracts the first 4 characters</li>
+<li>Converts them to uppercase</li>
+<li>Outputs the final ID</li>
+</ul>
+(Assume the word is always at least 4 letters long)`,
+    starter: ``,
+    tests: [
+      { inputs: ["computer"], expected: "COMP" },
+      { inputs: ["python"], expected: "PYTH" },
+      { inputs: ["algorithm"], expected: "ALGO" },
+      { inputs: ["hello"], expected: "HELL" }
+    ],
+    hint: "Use word[0:4] to get first 4 characters, then .upper() to convert"
+  },
+  {
+    id: 10,
+    title: "Read File - Top Students",
+    type: "code",
+    body: `Write an algorithm that opens <code>top_students.txt</code>, reads every line until the end of the file, outputs each line, and closes the file.<br><br>
+<em>The file is pre-created with sample data for testing.</em>`,
+    starter: ``,
+    tests: [
+      {
+        inputs: [],
+        validator: "file_read",
+        setupFile: { name: "top_students.txt", content: "Alice\nBob\nCharlie\n" },
+        expectedLines: ["Alice", "Bob", "Charlie"]
+      }
+    ],
+    hint: 'Use open("top_students.txt", "r"), then a for loop or .readlines(), then .close()'
+  },
+  {
+    id: 11,
+    title: "Dice Roller",
+    type: "code",
+    body: `Write an algorithm that:
+<ul>
+<li>Asks the user how many times they want to roll the dice</li>
+<li>Uses a loop to repeat that many times</li>
+<li>Generates a random number between 1 and 6 for each roll and outputs it</li>
+</ul>`,
+    starter: `import random\n`,
+    tests: [
+      {
+        inputs: ["5"],
+        validator: "dice_roll",
+        expectedCount: 5
+      }
+    ],
+    hint: "Use int(input()), a for loop with range(), and random.randint(1,6)"
+  },
+  {
+    id: 12,
+    title: "SQL Query - Players Table",
+    type: "noncode",
+    body: `The database table <strong>Players</strong> stores tournament info:<br>
+<table>
+<tr><th>PlayerID</th><th>Name</th><th>Score</th><th>Team</th></tr>
+<tr><td>01</td><td>John</td><td>450</td><td>Red</td></tr>
+<tr><td>02</td><td>Sarah</td><td>820</td><td>Blue</td></tr>
+<tr><td>03</td><td>Mika</td><td>310</td><td>Red</td></tr>
+<tr><td>04</td><td>Leo</td><td>950</td><td>Blue</td></tr>
+</table><br>
+Write an SQL query to retrieve the <strong>Name</strong> and <strong>Score</strong> of all players in the "Blue" team.`,
+    fields: [
+      { label: "SELECT", key: "select", placeholder: "e.g. Name, Score" },
+      { label: "FROM", key: "from", placeholder: "e.g. Players" },
+      { label: "WHERE", key: "where", placeholder: 'e.g. Team = "Blue"' }
+    ],
+    validator: function(answers) {
+      const s = answers.select.replace(/\s+/g,'').toLowerCase();
+      const f = answers.from.replace(/\s+/g,'').toLowerCase();
+      const w = answers.where.replace(/\s+/g,'').toLowerCase().replace(/['"]/g,'');
+      const selectOk = (s.includes('name') && s.includes('score'));
+      const fromOk = (f === 'players');
+      const whereOk = (w.includes('team') && w.includes('=') && w.includes('blue'));
+      return selectOk && fromOk && whereOk;
+    },
+    hint: 'SELECT the two columns, FROM the table name, WHERE Team = "Blue"'
+  },
+  {
+    id: 13,
+    title: "Password Length Validator",
+    type: "code",
+    body: `Write an algorithm that:
+<ul>
+<li>Prompts the user to input a password</li>
+<li>Uses a while loop to keep asking if the password is fewer than 8 characters</li>
+<li>Outputs "Password accepted" once a valid password is entered</li>
+</ul>`,
+    starter: ``,
+    tests: [
+      { inputs: ["short", "hi", "12345678"], expected: "Password accepted" },
+      { inputs: ["longpassword"], expected: "Password accepted" },
+      { inputs: ["abc", "abcdefgh"], expected: "Password accepted" }
+    ],
+    hint: "Use a while loop: while len(password) < 8, keep asking for input"
+  },
+  {
+    id: 14,
+    title: "Casting Fix",
+    type: "code",
+    body: `The following code is supposed to calculate age in 10 years:<pre>age = input("Enter your current age: ")
+future_age = age + 10
+print(future_age)</pre>
+Line 02 causes a <strong>runtime error</strong> because <code>input()</code> returns a string.<br><br>
+Fix the code using <strong>casting</strong> so the addition works correctly.`,
+    starter: `age = input("Enter your current age: ")\nfuture_age = \nprint(future_age)`,
+    tests: [
+      { inputs: ["15"], expected: "25" },
+      { inputs: ["20"], expected: "30" },
+      { inputs: ["0"], expected: "10" }
+    ],
+    hint: "Use int(age) to convert the string to an integer before adding 10"
+  },
+  {
+    id: 15,
+    title: "Array Search - Colours",
+    type: "code",
+    body: `A 1D array contains 5 colours:<pre>colours = ["Red", "Blue", "Green", "Yellow", "Purple"]</pre>
+Write a <code>for</code> loop that iterates over the array. If the colour is <code>"Yellow"</code>, output <code>"Match found"</code>.`,
+    starter: `colours = ["Red", "Blue", "Green", "Yellow", "Purple"]\n`,
+    tests: [
+      { inputs: [], expected: "Match found" }
+    ],
+    hint: 'for colour in colours: then if colour == "Yellow": print("Match found")'
+  },
+  {
+    id: 16,
+    title: "Rectangle Area Function",
+    type: "code",
+    body: `(a) Define a function <code>calculateArea()</code> that takes <strong>length</strong> and <strong>width</strong> as parameters, calculates the area, and <strong>returns</strong> the result.<br><br>
+(b) Call this function with values <strong>5</strong> and <strong>10</strong>, store the result in <code>totalArea</code>, and print it.`,
+    starter: ``,
+    tests: [
+      { inputs: [], expected: "50" }
+    ],
+    hint: "def calculateArea(length, width): return length * width, then totalArea = calculateArea(5, 10)"
+  },
+  {
+    id: 17,
+    title: "Trace Table - While Loop",
+    type: "noncode",
+    body: `Trace the following program:<pre>01 a = 12
+02 b = 3
+03 while a > 5
+04   a = a - b
+05   b = b + 1
+06 endwhile
+07 print(a)</pre>
+Complete the trace table showing a and b after each iteration, and the final printed output.`,
+    fields: [
+      { label: "After iteration 1: a =", key: "a1", placeholder: "value of a" },
+      { label: "After iteration 1: b =", key: "b1", placeholder: "value of b" },
+      { label: "After iteration 2: a =", key: "a2", placeholder: "value of a" },
+      { label: "After iteration 2: b =", key: "b2", placeholder: "value of b" },
+      { label: "After iteration 3: a =", key: "a3", placeholder: "value of a" },
+      { label: "After iteration 3: b =", key: "b3", placeholder: "value of b" },
+      { label: "Final output (print a):", key: "output", placeholder: "output" }
+    ],
+    validator: function(a) {
+      return a.a1==="9" && a.b1==="4" &&
+             a.a2==="5" && a.b2==="5" &&
+             (a.a3===undefined || a.a3==="") &&
+             (a.b3===undefined || a.b3==="") &&
+             a.output==="5";
+    },
+    hint: "Iteration 1: a=12-3=9, b=3+1=4. Iteration 2: a=9-4=5, b=4+1=5. Now a is NOT > 5, so loop ends."
+  },
+  {
+    id: 18,
+    title: "Test Data Types",
+    type: "noncode",
+    body: `An online form asks users to input a percentage test score between <strong>0 and 100</strong> inclusive.<br><br>
+Identify one piece of test data for each category:`,
+    fields: [
+      { label: "Normal data:", key: "normal", placeholder: "e.g. a typical valid value" },
+      { label: "Boundary data:", key: "boundary", placeholder: "e.g. a value at the edge of the range" },
+      { label: "Erroneous data:", key: "erroneous", placeholder: "e.g. an invalid value" }
+    ],
+    validator: function(a) {
+      const n = parseFloat(a.normal);
+      const b = parseFloat(a.boundary);
+      const e = a.erroneous.trim();
+      const normalOk = !isNaN(n) && n > 0 && n < 100;
+      const boundaryOk = (b === 0 || b === 100 || b === -1 || b === 101 || b === 1 || b === 99);
+      const erroneousOk = isNaN(parseFloat(e)) || parseFloat(e) < 0 || parseFloat(e) > 100;
+      return normalOk && boundaryOk && erroneousOk;
+    },
+    hint: "Normal: a value well within range (e.g. 50). Boundary: edge values (0, 100). Erroneous: invalid data (e.g. -5, 'abc')."
+  },
+  {
+    id: 19,
+    title: "Logic Error Fix",
+    type: "noncode",
+    body: `This code should calculate a 10% discount if price is <strong>greater than</strong> &pound;50, but has two logic errors:<pre>01 price = input("Enter price: ")
+02 if price == 50:
+03   discount = price * 10
+04   price = price - discount
+05 endif</pre>
+Identify and correct both errors.`,
+    fields: [
+      { label: "Error 1 description (Line 02):", key: "err1", placeholder: "What is wrong with line 02?" },
+      { label: "Corrected Line 02:", key: "fix1", placeholder: "e.g. if price > 50:" },
+      { label: "Error 2 description (Line 03):", key: "err2", placeholder: "What is wrong with line 03?" },
+      { label: "Corrected Line 03:", key: "fix2", placeholder: "e.g. discount = price * 0.1" }
+    ],
+    validator: function(a) {
+      const f1 = a.fix1.replace(/\s+/g,'').toLowerCase();
+      const f2 = a.fix2.replace(/\s+/g,'').toLowerCase();
+      const fix1ok = f1.includes('price>50') || f1.includes('price>=50');
+      const fix2ok = (f2.includes('price*0.1') || f2.includes('price*0.10') || f2.includes('price/10') || f2.includes('price*(10/100)') || f2.includes('price*10/100'));
+      return fix1ok && fix2ok;
+    },
+    hint: "Line 02: == means equals, but we need greater than (>). Line 03: * 10 gives 10x the price, not 10%."
+  },
+  {
+    id: 20,
+    title: "Bus Discount - Selection",
+    type: "code",
+    body: `A bus company gives a discount if a passenger has a <strong>student card</strong> OR is <strong>aged 65 or over</strong>.<br><br>
+Write an algorithm that:
+<ul>
+<li>Asks the user to input their age</li>
+<li>Asks if they have a student card ("Yes" or "No")</li>
+<li>Outputs "Discount applied" if they qualify, or "Full price" if not</li>
+</ul>`,
+    starter: ``,
+    tests: [
+      { inputs: ["20", "Yes"], expected: "Discount applied" },
+      { inputs: ["65", "No"], expected: "Discount applied" },
+      { inputs: ["70", "Yes"], expected: "Discount applied" },
+      { inputs: ["30", "No"], expected: "Full price" },
+      { inputs: ["18", "No"], expected: "Full price" },
+      { inputs: ["64", "No"], expected: "Full price" }
+    ],
+    hint: 'Use OR: if age >= 65 or card == "Yes"'
+  }
+];
 
-            const handleNext = () => {
-                if (feedbackStatus === 'GRANTED' && dataFragments % 4 === 0 && unlockedGadgets.length < GADGETS.length) {
-                    setGameState('reward');
-                    setFeedbackStatus(null);
-                } else {
-                    if (qIndex + 1 < activeServer.questions.length) {
-                        setQIndex(qIndex + 1);
-                        setFeedbackStatus(null);
-                    } else {
-                        setGameState('menu'); 
-                    }
-                }
-            };
+let currentQ = 0;
+let solved = new Set();
+let pyodide = null;
+let inputResolve = null;
+let savedCode = {};
+let failCounts = {};
 
-            const unlockGadget = () => {
-                const gadget = GADGETS[unlockedGadgets.length];
-                setUnlockedGadgets([...unlockedGadgets, gadget]);
-                if (qIndex + 1 < activeServer.questions.length) {
-                    setQIndex(qIndex + 1);
-                    setFeedbackStatus(null);
-                    setGameState('hacking');
-                } else {
-                    setGameState('menu');
-                }
-            };
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<h2>Questions</h2>';
+  QUESTIONS.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-btn' + (i === currentQ ? ' active' : '');
+    btn.id = 'qbtn-' + i;
+    btn.innerHTML = `<span class="dot ${solved.has(i) ? 'solved' : ''}" id="dot-${i}"></span><span class="q-label">Q${q.id}. ${q.title}</span>`;
+    btn.onclick = () => selectQuestion(i);
+    sb.appendChild(btn);
+  });
+}
 
-            // --- MENU UI ---
-            if (gameState === 'menu') {
-                return (
-                    <div className="flex flex-col items-center justify-center p-8 z-10 relative">
-                        <div className="text-center mb-12">
-                            <h1 className="text-6xl font-bold mb-4 glitch-text">MAINFRAME OVERRIDE</h1>
-                            <p className="text-xl text-[#33ccff] mb-6">> DECRYPT SERVERS TO UNLOCK GADGETS_</p>
-                            
-                            <div className="flex justify-center gap-8 items-center bg-[#0a0a0a] p-4 rounded border border-[#00ffaa]">
-                                <div className="text-2xl">
-                                    DATA FRAGMENTS: <span className="text-white">{dataFragments}</span>
-                                </div>
-                                <div className="h-8 w-px bg-[#00ffaa]"></div>
-                                <div className="text-2xl text-[#ff3366]">
-                                    GADGETS SECURED: {unlockedGadgets.length}/5
-                                </div>
-                            </div>
-                        </div>
+function selectQuestion(idx) {
+  if (currentQ === idx) return;
+  const ed = document.getElementById('codeEditor');
+  if (QUESTIONS[currentQ].type === 'code') {
+    savedCode[currentQ] = ed.value;
+  }
+  currentQ = idx;
+  renderQuestion();
+}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
-                            {SERVERS.map((server, idx) => (
-                                <button 
-                                    key={idx}
-                                    onClick={() => selectServer(idx)}
-                                    className="bg-[#0a0a0a] p-6 border-2 border-[#33ccff] hover:bg-[#00ffaa] hover:text-black transition-all text-left flex items-center gap-6 group"
-                                >
-                                    <div className="text-5xl">{server.icon}</div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold mb-1">{server.title}</h2>
-                                        <p className="text-sm opacity-80 group-hover:text-black">> INITIATE HACK_</p>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                );
-            }
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const panel = document.getElementById('questionPanel');
+  const editorArea = document.getElementById('editorArea');
+  const nonCodePanel = document.getElementById('nonCodePanel');
 
-            // --- BRIEFING UI ---
-            if (gameState === 'briefing') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative">
-                        <div className="bg-[#0a0a0a] p-10 border-2 border-[#ff3366] w-full max-w-4xl shadow-[0_0_40px_rgba(255,51,102,0.15)] text-left">
-                            <div className="text-[#ff3366] mb-2 text-xl font-bold">> TOP SECRET PROTOCOL</div>
-                            <h2 className="text-4xl text-white mb-8 border-b border-[#ff3366] pb-4">{activeServer.title} - BRIEFING</h2>
-                            
-                            <div className="flex flex-col gap-4 mb-12">
-                                {activeServer.briefing.map((line, i) => (
-                                    <p key={i} className="text-[#00ffaa] text-2xl leading-relaxed">{line}</p>
-                                ))}
-                            </div>
+  document.getElementById('qNumber').textContent = `Question ${q.id} of 20`;
+  document.getElementById('qTitle').textContent = q.title;
+  document.getElementById('qBody').innerHTML = q.body;
 
-                            <div className="text-center">
-                                <button 
-                                    onClick={beginHack}
-                                    className="bg-[#ff3366] text-black font-black text-2xl py-4 px-12 hover:bg-white transition-all shadow-[0_0_20px_rgba(255,51,102,0.4)] hover:scale-105"
-                                >
-                                    > ACKNOWLEDGE & BEGIN HACK
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
+  panel.className = 'question-panel' + (solved.has(currentQ) ? ' solved' : '');
 
-            // --- HACKING UI ---
-            if (gameState === 'hacking') {
-                const currentQ = activeServer.questions[qIndex];
-                
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative">
-                        <div className="w-full max-w-4xl flex justify-between items-center mb-8 border-b border-[#00ffaa] pb-4">
-                            <button onClick={() => setGameState('menu')} className="text-[#ff3366] hover:text-white border border-transparent hover:border-[#ff3366] px-3 py-1 transition-all">[ ABORT MISSION ]</button>
-                            <div className="text-xl bg-[#0a0a0a] px-4 py-2 border border-[#00ffaa]">NODE {qIndex + 1} / {activeServer.questions.length}</div>
-                        </div>
+  const hintBox = document.getElementById('hintBox');
+  hintBox.style.display = 'none';
+  hintBox.textContent = '';
 
-                        <div className="bg-[#0a0a0a] p-10 border-2 border-[#00ffaa] w-full max-w-4xl shadow-[0_0_40px_rgba(0,255,170,0.15)] text-center transition-all">
-                            {!feedbackStatus ? (
-                                <div>
-                                    <div className="text-[#33ccff] mb-4 text-xl">> DECRYPTION REQUIRED_</div>
-                                    <h2 className="text-4xl text-white mb-10 leading-tight">{currentQ.q}</h2>
-                                    <div className="flex flex-col gap-4 max-w-2xl mx-auto">
-                                        {currentQ.options.map((opt, i) => (
-                                            <button 
-                                                key={i}
-                                                onClick={() => handleAnswer(i)}
-                                                className="bg-[#050505] hover:bg-[#00ffaa] hover:text-black border-2 border-[#00ffaa] text-2xl py-4 px-6 transition-all uppercase font-bold tracking-wider"
-                                            >
-                                                > {opt}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center animate-[fadeIn_0.5s_ease-out]">
-                                    <h2 className={`text-6xl font-black mb-6 ${feedbackStatus === 'GRANTED' ? 'text-[#00ffaa]' : 'text-[#ff3366] glitch-text'}`}>
-                                        [ ACCESS {feedbackStatus} ]
-                                    </h2>
-                                    
-                                    {feedbackStatus === 'DENIED' && (
-                                        <div className="text-2xl text-white mb-8 bg-[#ff3366]/20 p-4 border border-[#ff3366]">
-                                            CORRECT OVERRIDE: <span className="text-[#00ffaa] font-bold">{currentQ.options[currentQ.correct]}</span>
-                                        </div>
-                                    )}
+  document.querySelectorAll('.q-btn').forEach((b, i) => {
+    b.className = 'q-btn' + (i === currentQ ? ' active' : '');
+  });
 
-                                    <div className="bg-[#111] border-l-4 border-[#33ccff] p-8 max-w-3xl text-left mb-10">
-                                        <p className="text-[#33ccff] text-xl mb-2">> TACTICAL ANALYSIS:</p>
-                                        <p className="text-white text-2xl leading-relaxed">{currentQ.exp}</p>
-                                    </div>
+  if (q.type === 'code') {
+    editorArea.style.display = 'flex';
+    nonCodePanel.style.display = 'none';
+    const ed = document.getElementById('codeEditor');
+    ed.value = savedCode[currentQ] !== undefined ? savedCode[currentQ] : (q.starter || '');
+    document.getElementById('outputContent').textContent = 'Click "Run" to execute your code.';
+    document.getElementById('outputContent').className = 'output-content';
+    document.getElementById('outputStatus').textContent = '';
+  } else {
+    editorArea.style.display = 'none';
+    nonCodePanel.style.display = 'flex';
+    renderNonCodeFields(q);
+  }
+}
 
-                                    <button 
-                                        onClick={handleNext}
-                                        className="bg-[#00ffaa] text-black font-black text-2xl py-4 px-12 hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,170,0.4)] hover:scale-105"
-                                    >
-                                        {qIndex + 1 < activeServer.questions.length ? "> PROCEED TO NEXT NODE" : "> RETURN TO MAINFRAME"}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
-            }
+function renderNonCodeFields(q) {
+  const panel = document.getElementById('nonCodePanel');
+  let html = '<div class="non-code-answer">';
+  q.fields.forEach(f => {
+    html += `<label>${f.label}</label>`;
+    html += `<input type="text" id="field-${f.key}" placeholder="${f.placeholder || ''}" value="${savedCode[currentQ + '-' + f.key] || ''}">`;
+  });
+  html += `<button class="btn btn-check" onclick="checkNonCode()">Check Answer</button>`;
+  html += `<div class="feedback-msg" id="nonCodeFeedback"></div>`;
+  html += '</div>';
+  panel.innerHTML = html;
+}
 
-            // --- REWARD UI ---
-            if (gameState === 'reward') {
-                const gadget = GADGETS[unlockedGadgets.length];
-                
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 z-10 relative bg-black/90">
-                        <div className="text-center">
-                            <h1 className="text-5xl text-[#33ccff] mb-8">> NEW GADGET AUTHORIZED</h1>
-                            
-                            <div className="bg-[#0a0a0a] p-12 border-4 border-[#33ccff] shadow-[0_0_60px_rgba(51,204,255,0.5)] max-w-2xl mx-auto">
-                                <div className="text-9xl mb-8 animate-bounce">{gadget.icon}</div>
-                                <h2 className="text-5xl text-white font-black mb-6 uppercase tracking-widest">{gadget.name}</h2>
-                                <p className="text-2xl text-[#00ffaa] mb-10 bg-[#00ffaa]/10 p-4 border border-[#00ffaa]">"{gadget.desc}"</p>
+function checkNonCode() {
+  const q = QUESTIONS[currentQ];
+  const answers = {};
+  q.fields.forEach(f => {
+    const el = document.getElementById('field-' + f.key);
+    answers[f.key] = el ? el.value.trim() : '';
+    savedCode[currentQ + '-' + f.key] = answers[f.key];
+  });
 
-                                <button 
-                                    onClick={unlockGadget}
-                                    className="w-full bg-[#33ccff] text-black font-black text-3xl py-6 hover:bg-white transition-all hover:scale-105"
-                                >
-                                    > EQUIP GADGET & CONTINUE
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
+  const fb = document.getElementById('nonCodeFeedback');
+  if (q.validator(answers)) {
+    fb.className = 'feedback-msg correct';
+    fb.textContent = 'Correct! Well done.';
+    markSolved(currentQ);
+  } else {
+    fb.className = 'feedback-msg incorrect';
+    if (!failCounts[currentQ]) failCounts[currentQ] = 0;
+    failCounts[currentQ]++;
+    if (failCounts[currentQ] >= 2) {
+      fb.textContent = 'Not quite right. Check the hint below for guidance.';
+      showHint();
+    } else {
+      fb.textContent = 'Not quite right. Try again!';
+    }
+  }
+}
 
-            return null;
-        }
+function showHint() {
+  const q = QUESTIONS[currentQ];
+  if (q.hint) {
+    const hintBox = document.getElementById('hintBox');
+    hintBox.textContent = 'Hint: ' + q.hint;
+    hintBox.style.display = 'block';
+  }
+}
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+function markSolved(idx) {
+  solved.add(idx);
+  const dot = document.getElementById('dot-' + idx);
+  if (dot) dot.className = 'dot solved';
+  const panel = document.getElementById('questionPanel');
+  panel.className = 'question-panel solved';
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (solved.size / QUESTIONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${solved.size} / ${QUESTIONS.length} solved`;
+}
+
+function resetCode() {
+  const q = QUESTIONS[currentQ];
+  if (q.type === 'code') {
+    document.getElementById('codeEditor').value = q.starter || '';
+    savedCode[currentQ] = q.starter || '';
+    document.getElementById('outputContent').textContent = 'Code reset. Click "Run" to execute.';
+    document.getElementById('outputContent').className = 'output-content';
+    document.getElementById('outputStatus').textContent = '';
+  }
+}
+
+async function runCode() {
+  const q = QUESTIONS[currentQ];
+  if (q.type !== 'code') return;
+
+  const code = document.getElementById('codeEditor').value;
+  savedCode[currentQ] = code;
+  const runBtn = document.getElementById('runBtn');
+  const outputEl = document.getElementById('outputContent');
+  const statusEl = document.getElementById('outputStatus');
+
+  runBtn.disabled = true;
+  runBtn.innerHTML = '&#9654; Running...';
+  outputEl.textContent = 'Running...';
+  outputEl.className = 'output-content';
+  statusEl.textContent = '';
+
+  let allPassed = true;
+  let lastOutput = '';
+  let lastError = '';
+
+  try {
+    for (const test of q.tests) {
+      const result = await executeTest(code, q, test);
+      if (!result.passed) {
+        allPassed = false;
+        lastOutput = result.output;
+        lastError = result.error;
+        break;
+      }
+      lastOutput = result.output;
+    }
+
+    if (allPassed) {
+      outputEl.textContent = lastOutput + '\n\n--- All tests passed! ---';
+      outputEl.className = 'output-content success';
+      statusEl.textContent = 'PASSED';
+      statusEl.style.color = 'var(--green)';
+      markSolved(currentQ);
+    } else {
+      if (!failCounts[currentQ]) failCounts[currentQ] = 0;
+      failCounts[currentQ]++;
+      if (lastError) {
+        outputEl.textContent = 'Error:\n' + lastError;
+      } else {
+        outputEl.textContent = lastOutput + '\n\n--- Output does not match expected result. Try again! ---';
+      }
+      outputEl.className = 'output-content error';
+      statusEl.textContent = 'NOT PASSED';
+      statusEl.style.color = 'var(--accent)';
+      if (failCounts[currentQ] >= 3) {
+        showHint();
+      }
+    }
+  } catch (e) {
+    outputEl.textContent = 'Error: ' + e.message;
+    outputEl.className = 'output-content error';
+    statusEl.textContent = 'ERROR';
+    statusEl.style.color = 'var(--accent)';
+  }
+
+  runBtn.disabled = false;
+  runBtn.innerHTML = '&#9654; Run';
+}
+
+async function executeTest(code, question, test) {
+  let fullCode = '';
+  let output = '';
+  let error = '';
+
+  const inputQueue = test.inputs ? [...test.inputs] : [];
+
+  if (test.validator === 'file_write') {
+    fullCode = `
+_written_files = {}
+_orig_open = open
+class _FakeFile:
+    def __init__(self, name, mode):
+        self.name = name
+        self.mode = mode
+        self.data = ""
+    def write(self, s):
+        self.data += s
+    def close(self):
+        _written_files[self.name] = self.data
+    def __enter__(self):
+        return self
+    def __exit__(self, *a):
+        self.close()
+
+def _fake_open(name, mode="r"):
+    return _FakeFile(name, mode)
+
+open = _fake_open
+
+_input_queue = ${JSON.stringify(inputQueue)}
+_input_idx = 0
+_orig_input = input
+def input(prompt=""):
+    global _input_idx
+    if _input_idx < len(_input_queue):
+        val = _input_queue[_input_idx]
+        _input_idx += 1
+        return val
+    return ""
+
+${code}
+
+open = _orig_open
+input = _orig_input
+`;
+    try {
+      await pyodide.runPythonAsync(fullCode);
+      const files = pyodide.globals.get('_written_files').toJs();
+      const fileContent = files.get(test.checkFile) || '';
+      let allFound = true;
+      for (const s of test.checkContains) {
+        if (!fileContent.includes(s)) { allFound = false; break; }
+      }
+      return { passed: allFound, output: allFound ? 'File written successfully with correct data.' : 'File content missing expected data.\nGot: ' + fileContent, error: '' };
+    } catch (e) {
+      return { passed: false, output: '', error: e.message };
+    }
+  }
+
+  if (test.validator === 'file_read') {
+    const setup = test.setupFile;
+    fullCode = `
+_printed = []
+_orig_print = print
+def print(*args, **kwargs):
+    _printed.append(" ".join(str(a) for a in args))
+    _orig_print(*args, **kwargs)
+
+_file_data = ${JSON.stringify(setup.content)}
+class _FakeFile:
+    def __init__(self, data):
+        self.lines = data.split("\\n")
+        if self.lines and self.lines[-1] == "":
+            self.lines = self.lines[:-1]
+        self.idx = 0
+    def readline(self):
+        if self.idx < len(self.lines):
+            line = self.lines[self.idx] + "\\n"
+            self.idx += 1
+            return line
+        return ""
+    def readlines(self):
+        return [l + "\\n" for l in self.lines]
+    def read(self):
+        return _file_data
+    def close(self):
+        pass
+    def __enter__(self):
+        return self
+    def __exit__(self, *a):
+        self.close()
+    def __iter__(self):
+        return iter(self.lines)
+
+def _fake_open(name, mode="r"):
+    return _FakeFile(_file_data)
+
+open = _fake_open
+
+${code}
+
+print = _orig_print
+open = __builtins__.open if hasattr(__builtins__, 'open') else _orig_open
+`;
+    try {
+      await pyodide.runPythonAsync(fullCode);
+      const printed = pyodide.globals.get('_printed').toJs();
+      let allFound = true;
+      for (const line of test.expectedLines) {
+        const found = printed.some(p => p.replace(/\\n/g, '').trim().includes(line.trim()));
+        if (!found) { allFound = false; break; }
+      }
+      return { passed: allFound, output: printed.join('\n'), error: '' };
+    } catch (e) {
+      return { passed: false, output: '', error: e.message };
+    }
+  }
+
+  if (test.validator === 'dice_roll') {
+    fullCode = `
+_printed = []
+_orig_print = print
+def print(*args, **kwargs):
+    _printed.append(" ".join(str(a) for a in args))
+    _orig_print(*args, **kwargs)
+
+_input_queue = ${JSON.stringify(inputQueue)}
+_input_idx = 0
+_orig_input = input
+def input(prompt=""):
+    global _input_idx
+    if _input_idx < len(_input_queue):
+        val = _input_queue[_input_idx]
+        _input_idx += 1
+        return val
+    return ""
+
+${code}
+
+print = _orig_print
+input = _orig_input
+`;
+    try {
+      await pyodide.runPythonAsync(fullCode);
+      const printed = pyodide.globals.get('_printed').toJs();
+      const nums = printed.map(p => {
+        const n = parseInt(p.trim());
+        return n;
+      }).filter(n => !isNaN(n) && n >= 1 && n <= 6);
+      const passed = nums.length >= test.expectedCount;
+      return { passed, output: printed.join('\n'), error: '' };
+    } catch (e) {
+      return { passed: false, output: '', error: e.message };
+    }
+  }
+
+  if (test.call) {
+    fullCode = `
+_printed = []
+_orig_print = print
+def print(*args, **kwargs):
+    _printed.append(" ".join(str(a) for a in args))
+
+${code}
+
+${test.call}
+print = _orig_print
+`;
+    try {
+      await pyodide.runPythonAsync(fullCode);
+      const printed = pyodide.globals.get('_printed').toJs();
+      output = printed.join('\n').trim();
+      const passed = output === test.expected.trim();
+      return { passed, output, error: '' };
+    } catch (e) {
+      return { passed: false, output: '', error: e.message };
+    }
+  }
+
+  fullCode = `
+_printed = []
+_orig_print = print
+def print(*args, **kwargs):
+    _printed.append(" ".join(str(a) for a in args))
+
+_input_queue = ${JSON.stringify(inputQueue)}
+_input_idx = 0
+_orig_input = input
+def input(prompt=""):
+    global _input_idx
+    if _input_idx < len(_input_queue):
+        val = _input_queue[_input_idx]
+        _input_idx += 1
+        return val
+    return ""
+
+${code}
+
+print = _orig_print
+input = _orig_input
+`;
+
+  try {
+    await pyodide.runPythonAsync(fullCode);
+    const printed = pyodide.globals.get('_printed').toJs();
+    output = printed.join('\n').trim();
+    const expected = test.expected.trim();
+    const passed = output === expected;
+    return { passed, output, error: '' };
+  } catch (e) {
+    return { passed: false, output: '', error: e.message };
+  }
+}
+
+function handleTab(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ta = e.target;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + 4;
+  }
+}
+
+async function init() {
+  const loading = document.getElementById('loadingOverlay');
+  try {
+    pyodide = await loadPyodide();
+    loading.classList.add('hidden');
+    buildSidebar();
+    renderQuestion();
+    document.getElementById('codeEditor').addEventListener('keydown', handleTab);
+  } catch (e) {
+    loading.innerHTML = `<p style="color:var(--accent)">Failed to load Python environment.<br>${e.message}<br><br>Please refresh the page.</p>`;
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const q = QUESTIONS[currentQ];
+    if (q.type === 'code') runCode();
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<script>init();</script>
 </body>
 </html>
